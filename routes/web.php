@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+use App\Http\Controllers\CreditRequestController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,6 +32,9 @@ Route::get('/credit-request', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 })->name('credit.request');
+
+Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
+
 
 Route::middleware([
     'auth:sanctum',
