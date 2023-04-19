@@ -26,7 +26,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'raw_rol',
     ];
 
     /**
@@ -59,7 +59,7 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function hasManyCreditsRequests(Type $var = null)
+    public function hasManyCreditsRequests()
     {
         return $this->hasMany(CreditRequest::class, 'user_id');
     }

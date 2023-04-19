@@ -2,6 +2,10 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
 
+defineProps({
+    isCliente: Boolean,
+});
+
 const estadoCupoDisponible = ref([
     { text: 'Estado de evaluacion', value: 0, color: 0 }, // 0: gris  1: verde 
     { text: 'Credito estado de propuesta', value: 1, color: 0 }, // 0: gris  1: verde 
@@ -15,10 +19,10 @@ const estadoCupoDisponible = ref([
 </script>
 
 <template>
-    <AppLayout title="Dashboard">
+    <AppLayout title="Dashboard" :isCliente="isCliente">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Dashboard
+                Dashboard 
             </h2>
         </template>
 

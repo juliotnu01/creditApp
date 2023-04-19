@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CreditRequestController;
+use Symfony\Component\HttpFoundation\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +38,17 @@ Route::get('/credit-request', function () {
 Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
 
 
-Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
     
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+    Route::get('/dashboard', function (Request $request) {
+        // dd($request->user());
+        if($request->user()->raw_rol == 'admin'){
+            $isCliente = false;
+            return Inertia::location('solicitudes-de-creditos', ["isCliente" => $isCliente]);
+        }elseif($request->user()->raw_rol == 'cliente'){
+            $isCliente = true;
+            return Inertia::render('Dashboard', ["isCliente" => $isCliente]);
+        }
     })->name('dashboard');
     Route::get('/solicitudes-de-creditos', function () {
         return Inertia::render('HistorialCreditRequest/index');

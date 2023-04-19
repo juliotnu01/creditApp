@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CreditRequestController extends Controller
 {
@@ -19,7 +19,7 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::all();
+            $creditRequest = CreditRequest::with('belongToUser')->get();
             return response()->json($creditRequest);
 
         } catch (\Throwable $th) {
@@ -145,11 +145,13 @@ class CreditRequestController extends Controller
                 $creditRequest->numero_curp_obligado = $request->numero_curp_obligado;
                 $creditRequest->file_comprobante_de_domicilio =  $urlfile_comprobante_de_domicilio;
                 $creditRequest->domicilio = $request->domicilio;
+                $creditRequest->uui = (string) Str::uuid();
                 $credenciales = [
                     "name" => $request->nombre,
                     "email" => $request->correo,
                     "password" => $request->numero_curp,
                     "password_confirmation" => $request->numero_curp,
+                    'raw_rol' => 'cliente',
                     "terms" => false,
                 ];
                 $login = [
@@ -165,6 +167,25 @@ class CreditRequestController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    public function enviarCreditoAEstudio(Request $request)
+    {
+        return DB::transaction(function () use($request) {
+            $SolicitudDeCredito = new CreditRequest();
+            $SolicitudDeCredito->find($request->id_credito)->update([
+                "status" => 1
+            ]);
+        });
+    }
+    public function rechazarCredito(Request $request)
+    {
+        return DB::transaction(function () use($request) {
+            $SolicitudDeCredito = new CreditRequest();
+            $SolicitudDeCredito->find($request->id_credito)->update([
+                "status" => 2
+            ]);
+        });
     }
 
 
