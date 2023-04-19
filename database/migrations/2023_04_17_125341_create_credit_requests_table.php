@@ -27,7 +27,8 @@ return new class extends Migration
             $table->text("numero_curp")->nullable();
             $table->text("file_comprobante_domicilio_cliente")->nullable();
             $table->text("direccion_domicilio")->nullable();
-            $table->text("relacion_con_la_persona_del_titular_del_comprobante_domicilio")->nullable();
+            $table->text("relacion_per_del_titular_del_compro_domicilio_cliente")->nullable();
+            $table->text("relacion_per_del_titular_del_compro_domicilio_domicilio")->nullable();
             $table->text("file_caratula_del_estado_de_cuenta")->nullable();
             $table->text("principal_fuente_de_ingreso_como_piensa_pagar_lo_solicitado")->nullable();
             $table->text("cual_es_producto_que_esta_solicitando")->nullable();

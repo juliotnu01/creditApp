@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CreditRequestController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,12 +37,12 @@ Route::get('/credit-request', function () {
 Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
 
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+    
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    Route::get('/solicitudes-de-creditos', function () {
+        return Inertia::render('HistorialCreditRequest/index');
+    })->name('credits.requests');
 });

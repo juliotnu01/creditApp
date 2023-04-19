@@ -19,7 +19,8 @@ export const useCreditRequest = defineStore('creditRequest', {
             numero_curp: '',
             file_comprobante_domicilio_cliente: '',
             direccion_domicilio: '',
-            relacion_con_la_persona_del_titular_del_comprobante_domicilio: '',
+            relacion_per_del_titular_del_compro_domicilio_cliente: '',
+            relacion_per_del_titular_del_compro_domicilio_domicilio: '',
             file_caratula_del_estado_de_cuenta: '',
             principal_fuente_de_ingreso_como_piensa_pagar_lo_solicitado: '',
             cual_es_producto_que_esta_solicitando:'',
@@ -29,7 +30,7 @@ export const useCreditRequest = defineStore('creditRequest', {
             desde_cuando_lo_conoce_por_que_lo_refiere: '',
             tiene_redes_sociales: '',
             ciudad: '',
-            // monto_de_dinero_solicitado: ''
+            monto_de_dinero_solicitado: 0,
             razon_del_prestamo: '',
             hace_cuanto_tiempo_debe_ese_dinero: '',
             a_que_institucion_le_debe_ese_dinero: '',
@@ -49,13 +50,19 @@ export const useCreditRequest = defineStore('creditRequest', {
             numero_curp_obligado: '',
             file_comprobante_de_domicilio: '',
             domicilio: ''
-        }
+        },
+        valueRange: 3000,
     }),
     getters: {
         getteramortizaciones: (state) => state.amortizaciones,
         getterformulario: (state) => state.formulario,
+        gettervalueRange: (state) => state.valueRange,
     },
     actions: {
+        setValueRange(data){
+            this.formulario.monto_de_dinero_solicitado = data
+            this.valueRange = data
+        },
         setAmortizaciones(data){
             this.getteramortizaciones.push(data) 
         },

@@ -21,8 +21,15 @@ const amortizaciones = computed({
         storeCreditRequest.setAmortizaciones(val)
     }
 })
+const valueRange = computed({
+    get() {
+        return storeCreditRequest.valueRange
+    },
+    set(val) {
+        storeCreditRequest.setValueRange(val)
+    }
+})
 const Fecha = moment();
-const valueRange = ref(3000);
 const openModal = ref(false);
 const ModelTablaCalculo = ref({
     tipoPago: 'Mensual',
@@ -159,8 +166,8 @@ onMounted(async () => {
                 Log in</Link>
 
                 <!-- <Link v-if="canRegister" :href="route('register')"
-                                                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                                                    Register</Link> -->
+                                                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+                                                        Register</Link> -->
             </template>
         </div>
 
@@ -190,9 +197,19 @@ onMounted(async () => {
                                 ¿Cuanto dinero necesitas?
                             </h5>
                             <div class="flex justify-end">
-                                <div class="relative mb-3" data-te-input-wrapper-init>
-                                    <div class="inline-flex">
+                                <div class="relative mb-3 w-40" >
+                                    <!-- <div class="inline-flex">
                                         {{ formattedValue }}
+                                    </div> -->
+                                    <div class="relative mb-4 flex flex-wrap ">
+                                        <span
+                                            class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                            id="basic-addon1">$</span>
+                                        <input type="number"
+                                        v-model="valueRange"
+                                            min="3000"
+                                            class="relative m-0 text-right block w-6 min-w-4 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                            placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" />
                                     </div>
                                 </div>
                             </div>
