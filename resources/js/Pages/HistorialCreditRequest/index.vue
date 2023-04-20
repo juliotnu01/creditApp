@@ -10,6 +10,7 @@ defineProps({
 const storeCreditRequest = useCreditRequest();
 const dataCreditRequest = ref([])
 const openModal = ref(false);
+const openModalViewAmortizaciones = ref(false);
 const formulario = computed({
     get() {
         return storeCreditRequest.formulario
@@ -18,7 +19,14 @@ const formulario = computed({
         storeCreditRequest.setformulario(val)
     }
 })
-
+const amortizaciones = computed({
+    get() {
+        return storeCreditRequest.amortizaciones
+    },
+    set(val) {
+        storeCreditRequest.setAmortizaciones(val)
+    }
+})
 const getSolicitudesDeCreditos = async () => {
     try {
         let { data } = await axios('/api/get-credit-request')
@@ -39,20 +47,20 @@ const viewSolicitudDeCredito = async (credito = nul) => {
     openModal.value = true
 }
 
-const enviarCreditoAEstudio = async (credito= null) => {
+const enviarCreditoAEstudio = async (credito = null) => {
     try {
-        axios.post('/api/enviar-credito-a-estudio', {id_credito: credito.id, uui: credito.uui})
+        axios.post('/api/enviar-credito-a-estudio', { id_credito: credito.id, uui: credito.uui })
         getSolicitudesDeCreditos();
         openModal.value = false
     } catch (error) {
         console.log(error)
     }
 }
-const RechazarCreditoAEstudio = async (credito= null) => {
+const RechazarCreditoAEstudio = async (credito = null) => {
     try {
-        axios.post('/api/rechazar-credito', {id_credito: credito.id, uui: credito.uui})
+        axios.post('/api/rechazar-credito', { id_credito: credito.id, uui: credito.uui })
         getSolicitudesDeCreditos();
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -100,13 +108,13 @@ onMounted(() => {
                                 </td>
                                 <td class="py-3 px-6 text-center">
                                     <!-- <div class="flex items-center justify-center">
-                                                                        <img class="w-6 h-6 rounded-full border-gray-200 border transform hover:scale-125"
-                                                                            src="https://randomuser.me/api/portraits/men/1.jpg" />
-                                                                        <img class="w-6 h-6 rounded-full border-gray-200 border -m-1 transform hover:scale-125"
-                                                                            src="https://randomuser.me/api/portraits/women/2.jpg" />
-                                                                        <img class="w-6 h-6 rounded-full border-gray-200 border -m-1 transform hover:scale-125"
-                                                                            src="https://randomuser.me/api/portraits/men/3.jpg" />
-                                                                    </div> -->
+                                                                            <img class="w-6 h-6 rounded-full border-gray-200 border transform hover:scale-125"
+                                                                                src="https://randomuser.me/api/portraits/men/1.jpg" />
+                                                                            <img class="w-6 h-6 rounded-full border-gray-200 border -m-1 transform hover:scale-125"
+                                                                                src="https://randomuser.me/api/portraits/women/2.jpg" />
+                                                                            <img class="w-6 h-6 rounded-full border-gray-200 border -m-1 transform hover:scale-125"
+                                                                                src="https://randomuser.me/api/portraits/men/3.jpg" />
+                                                                        </div> -->
                                     <span>{{ formatCurrency(solicitud.monto_de_dinero_solicitado) }}</span>
                                 </td>
                                 <td class="py-3 px-6 text-center">
@@ -129,22 +137,23 @@ onMounted(() => {
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </div>
-                                        <div class="w-4 mr-2 transform  hover:scale-110">
+                                        <div class="w-4 mr-2 transform  hover:scale-110" @click.prevent="openModalViewAmortizaciones = true" >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
                                         </div>
-                                        <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110" @click.prevent="RechazarCreditoAEstudio(solicitud)">
+                                        <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110"
+                                            @click.prevent="RechazarCreditoAEstudio(solicitud)">
                                             <svg fill="#000000" height="15px" width="15px" viewBox="0 0 329.328 329.328"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
-                                                                            c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
-                                                                            L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
-                                                                            c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
-                                                                            C299.324,238.921,238.917,299.328,164.666,299.328z" />
+                                                                                c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
+                                                                                L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
+                                                                                c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
+                                                                                C299.324,238.921,238.917,299.328,164.666,299.328z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -200,12 +209,12 @@ onMounted(() => {
                                     </div>
                                     <div>
                                         <label class="block mb-2 font-bold" for="nacionalidad">Nacionalidad:</label>
-                                        <input disabled class="w-full py-2 px-3 rounded border" type="text"
-                                            id="nacionalidad" v-model="formulario.nacionalidad">
-                                    </div>
-                                    <div>
-                                        <label class="block mb-2 font-bold" for="correo">Correo:</label>
-                                        <input disabled class="w-full py-2 px-3 rounded border" type="email" id="correo"
+                                    <input disabled class="w-full py-2 px-3 rounded border" type="text"
+                                        id="nacionalidad" v-model="formulario.nacionalidad">
+                                </div>
+                                <div>
+                                    <label class="block mb-2 font-bold" for="correo">Correo:</label>
+                                    <input disabled class="w-full py-2 px-3 rounded border" type="email" id="correo"
                                             v-model="formulario.correo">
                                     </div>
                                     <div>
@@ -220,12 +229,12 @@ onMounted(() => {
                                             v-model="formulario.telefono">
                                     </div>
                                     <div>
-                                    <label class="block mb-2 font-bold" for="text_comprobante_ine_identificacion">
-                                        INE o identificación:
-                                    </label>
-                                    <input disabled class="w-full py-2 px-3 rounded border" type="text"
-                                        id="text_comprobante_ine_identificacion"
-                                        v-model="formulario.text_comprobante_ine_identificacion">
+                                        <label class="block mb-2 font-bold" for="text_comprobante_ine_identificacion">
+                                            INE o identificación:
+                                        </label>
+                                        <input disabled class="w-full py-2 px-3 rounded border" type="text"
+                                            id="text_comprobante_ine_identificacion"
+                                            v-model="formulario.text_comprobante_ine_identificacion">
                                     </div>
                                     <div>
                                         <label class="block mb-2 font-bold" for="tipo_identificacion_social">
@@ -264,12 +273,12 @@ onMounted(() => {
                                             v-model="formulario.relacion_per_del_titular_del_compro_domicilio_cliente">
                                     </div>
                                     <!-- <div>
-                                                                        <label class="block mb-2 font-bold" for="text_comprobante_ine_identificacion">
-                                                                            Comprobante de domicilio alterno
-                                                                        </label>
-                                                                        <input v-model="formulario." class="w-full py-2 px-3 rounded border" type="text"
-                                                                            id="text_comprobante_ine_identificacion">
-                                                                    </div> -->
+                                                                            <label class="block mb-2 font-bold" for="text_comprobante_ine_identificacion">
+                                                                                Comprobante de domicilio alterno
+                                                                            </label>
+                                                                            <input v-model="formulario." class="w-full py-2 px-3 rounded border" type="text"
+                                                                                id="text_comprobante_ine_identificacion">
+                                                                        </div> -->
                                     <div>
                                         <label class="block mb-2 font-bold"
                                             for="relacion_con_la_persona_del_titular_del_comprobante_domicilio">
@@ -573,42 +582,44 @@ onMounted(() => {
                                             <tr class="border-b border-gray-200 hover:bg-gray-100">
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_caratula_del_estado_de_cuenta"
+                                                    <a target="_blank" :href="formulario.file_caratula_del_estado_de_cuenta"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
                                                 </td>
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_comprobante_de_domicilio"
+                                                    <a target="_blank" :href="formulario.file_comprobante_de_domicilio"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
                                                 </td>
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_comprobante_domicilio_cliente"
+                                                    <a target="_blank" :href="formulario.file_comprobante_domicilio_cliente"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
                                                 </td>
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_comprobante_ine_identificacion"
+                                                    <a target="_blank"
+                                                        :href="formulario.file_comprobante_ine_identificacion"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
                                                 </td>
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_comprobante_ine_o_identificacion_oficial"
+                                                    <a target="_blank"
+                                                        :href="formulario.file_comprobante_ine_o_identificacion_oficial"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
                                                 </td>
                                                 <td class="py-3 px-6 text-center whitespace-nowrap">
 
-                                                    <a :href="formulario.file_foto_de_tarjeta"
+                                                    <a target="_blank" :href="formulario.file_foto_de_tarjeta"
                                                         class="relative inline-block text-base font-medium text-indigo-500">
                                                         <span class="block">ver documento</span>
                                                     </a>
@@ -617,10 +628,11 @@ onMounted(() => {
                                                 <td class="py-3 px-6 text-center">
                                                     <div class="flex item-center justify-center">
                                                         <div class="w-4 mr-2 transform  hover:scale-110">
-                                                            <svg width="15px" height="15px" stroke="currentColor" viewBox="0 0 24 24"
-                                                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <svg width="15px" height="15px" stroke="currentColor"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
                                                                 <g id="Interface / Check_All_Big">
-                                                                    <path 
+                                                                    <path
                                                                         d="M7 12L11.9497 16.9497L22.5572 6.34326M2.0498 12.0503L6.99955 17M17.606 6.39355L12.3027 11.6969"
                                                                         stroke="#000000" stroke-width="2"
                                                                         stroke-linecap="round" stroke-linejoin="round" />
@@ -633,10 +645,10 @@ onMounted(() => {
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     stroke-width="2"
                                                                     d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
-                                                                        c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
-                                                                        L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
-                                                                        c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
-                                                                        C299.324,238.921,238.917,299.328,164.666,299.328z" />
+                                                                            c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
+                                                                            L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
+                                                                            c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
+                                                                            C299.324,238.921,238.917,299.328,164.666,299.328z" />
                                                             </svg>
                                                         </div>
                                                     </div>
@@ -655,9 +667,94 @@ onMounted(() => {
                 </template>
                 <template #footer>
                     <div class="flex justify-end">
-                        <btnPrimay @click.prevent="enviarCreditoAEstudio(formulario)" >Enviar a estudio</btnPrimay>
+                        <btnPrimay @click.prevent="enviarCreditoAEstudio(formulario)">Enviar a estudio</btnPrimay>
                     </div>
-            </template>
-        </modal>
+                </template>
+            </modal>
+            <modal :show="openModalViewAmortizaciones" maxWidth="2x1" >
+                <template #title>
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3" @click="openModalViewAmortizaciones = !openModalViewAmortizaciones">
+                        <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20">
+                            <title>Close</title>
+                            <path
+                                d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        </svg>
+                    </span>
+                </template>
+
+                <template #content>
+                    <div class="flex mt-8 w-full flex-col rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 w-full">
+                        <div class="overflow-x-auto max-w-6/12 flex items-center justify-center">
+                            <div class="w-auto  max-w-4/12 ">
+                                <div class="bg-white shadow-md rounded my-6">
+                                    <table class=" mx-20 table-auto">
+                                        <thead>
+                                            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                                                <th class="py-3 px-6 text-center">Periodo</th>
+                                                <th class="py-3 px-6 text-center">Capital</th>
+                                                <th class="py-3 px-6 text-center">Interes</th>
+                                                <th class="py-3 px-6 text-center">Pago</th>
+                                                <th class="py-3 px-6 text-center">Dias de pago</th>
+                                                <th class="py-3 px-6 text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600 text-sm font-light">
+                                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                                <td class="py-3 px-6 text-center whitespace-nowrap">
+
+                                                    <a target="_blank" :href="formulario.file_caratula_del_estado_de_cuenta"
+                                                        class="relative inline-block text-base font-medium text-indigo-500">
+                                                        <span class="block">{{amortizaciones}}</span>
+                                                    </a>
+                                                </td>
+                                                
+
+                                                <td class="py-3 px-6 text-center">
+                                                    <div class="flex item-center justify-center">
+                                                        <div class="w-4 mr-2 transform  hover:scale-110">
+                                                            <svg width="15px" height="15px" stroke="currentColor"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <g id="Interface / Check_All_Big">
+                                                                    <path
+                                                                        d="M7 12L11.9497 16.9497L22.5572 6.34326M2.0498 12.0503L6.99955 17M17.606 6.39355L12.3027 11.6969"
+                                                                        stroke="#000000" stroke-width="2"
+                                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                                </g>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110">
+                                                            <svg fill="#000000" height="15px" width="15px"
+                                                                viewBox="0 0 329.328 329.328" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
+                                                                            c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
+                                                                            L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
+                                                                            c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
+                                                                            C299.324,238.921,238.917,299.328,164.666,299.328z" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </template>
+                <template #footer>
+                    <div class="flex justify-end">
+                        <btnPrimay @click.prevent="enviarCreditoAEstudio(formulario)">Enviar a estudio</btnPrimay>
+                    </div>
+                </template>
+            </modal>
     </div>
 </AppLayout></template>

@@ -12,6 +12,7 @@ defineProps({
     laravelVersion: String,
     phpVersion: String,
 });
+
 const storeCreditRequest = useCreditRequest();
 const amortizaciones = computed({
     get() {
@@ -29,6 +30,7 @@ const valueRange = computed({
         storeCreditRequest.setValueRange(val)
     }
 })
+
 const Fecha = moment();
 const openModal = ref(false);
 const ModelTablaCalculo = ref({
@@ -126,7 +128,6 @@ const calcularTabla = (capitalInicial, interes, pago, tabla) => {
     // Llamamos recursivamente la función con el nuevo capital
     return calcularTabla(nuevoCapital, interes, pago, tabla);
 }
-const tablaSimulador = ref([]);
 const openSimuladorDeCredito = async () => {
 
     var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, []);
@@ -137,7 +138,6 @@ const openSimuladorDeCredito = async () => {
     }
     openModal.value = true
 }
-
 const quieroMimCredito = async () => {
     try {
         router.visit('/credit-request')

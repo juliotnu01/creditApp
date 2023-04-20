@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Fortify\CreateNewUser;
-use App\Models\{CreditRequest, User};
+use App\Models\{CreditRequest, User, Aamortizacion};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use DB;
@@ -19,7 +19,34 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser')->get();
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')->get();
+            return response()->json($creditRequest);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+    }
+
+    public function indexHistorialUser($id)
+    {
+        try {
+
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')
+            ->where('user_id', $id)
+            ->get();
+            return response()->json($creditRequest);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+    }
+    public function indexRecentCreditRequestUser($id)
+    {
+        try {
+
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')->where('user_id', $id)->orderBy('id', 'DESC')->first();
             return response()->json($creditRequest);
 
         } catch (\Throwable $th) {
@@ -146,6 +173,9 @@ class CreditRequestController extends Controller
                 $creditRequest->file_comprobante_de_domicilio =  $urlfile_comprobante_de_domicilio;
                 $creditRequest->domicilio = $request->domicilio;
                 $creditRequest->uui = (string) Str::uuid();
+
+
+
                 $credenciales = [
                     "name" => $request->nombre,
                     "email" => $request->correo,
@@ -162,6 +192,21 @@ class CreditRequestController extends Controller
                 $user = User::where('email', $request->correo)->first();
                 $creditRequest->user_id = $user->id;
                 $creditRequest->save();
+                
+                
+                $amortizaicones = json_decode($request->amortizaciones);
+                for ($i=0; $i < count($amortizaicones) ; $i++) { 
+                    $element  = $amortizaicones[$i];
+                    $amort = new Aamortizacion();
+                    $amort->periodo = $element->periodo;
+                    $amort->interes = $element->interes;
+                    $amort->capital = $element->capital;
+                    $amort->pago = $element->pago;
+                    $amort->dias_pago = date("Y-m-d", strtotime($element->dias_pago));
+                    $amort->uui_credit_request = $creditRequest->uui;
+                    $amort->credit_request_id = $creditRequest->id;
+                    $amort->save();
+                }
                 return response()->json($login);
             }, 5);
         } catch (\Throwable $th) {

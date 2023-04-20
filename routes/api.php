@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CreditRequestController;
+use App\Http\Controllers\{CreditRequestController, AaMortizacioncontroller};
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-credit-request',[CreditRequestController::class, 'index'])->name('get.credit.request');
     Route::post('/enviar-credito-a-estudio',[CreditRequestController::class, 'enviarCreditoAEstudio'])->name('enviar.credito.a.estuidio');
     Route::post('/rechazar-credito',[CreditRequestController::class, 'rechazarCredito'])->name('rechazar.credito');
+    Route::get('/get-historial-user/{id}',[CreditRequestController::class, 'indexHistorialUser'])->name('get.historial.user');
+    Route::get('/get-recent-credit-request/{id}',[CreditRequestController::class, 'indexRecentCreditRequestUser'])->name('get.recent.credit.request');
+    Route::post('/add-recibo-de-pago-user',[AaMortizacioncontroller::class, 'store'])->name('add.recibo.de.pago.user');
 });
 
 

@@ -14,6 +14,14 @@ defineProps({
     laravelVersion: String,
     phpVersion: String,
 });
+const amortizaciones = computed({
+    get() {
+        return storeCreditRequest.amortizaciones
+    },
+    set(val) {
+        storeCreditRequest.setAmortizaciones(val)
+    }
+})
 const storeCreditRequest = useCreditRequest();
 const formulario = computed({
     get() {
@@ -79,6 +87,7 @@ const enviarCreditRequest = async () => {
         formData.append('ine_o_identificacion_oficial', formulario.value.ine_o_identificacion_oficial);
         formData.append('numero_curp_obligado', formulario.value.numero_curp_obligado);
         formData.append('domicilio', formulario.value.domicilio);
+        formData.append('amortizaciones', JSON.stringify(amortizaciones.value));
         let { data } = await axios.post('/guardar-solicitud-de-credito', formData, { headers: { "Content-Type": "multipart/form-data" } });
         const form = useForm({
             email: data.email,

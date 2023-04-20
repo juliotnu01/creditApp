@@ -51,14 +51,19 @@ export const useCreditRequest = defineStore('creditRequest', {
             file_comprobante_de_domicilio: '',
             domicilio: ''
         },
+        tablaAmortizaciones: [],
         valueRange: 3000,
     }),
     getters: {
         getteramortizaciones: (state) => state.amortizaciones,
         getterformulario: (state) => state.formulario,
         gettervalueRange: (state) => state.valueRange,
+        gettertablaAmortizaciones: (state) => state.tablaAmortizaciones,
     },
     actions: {
+        setTablaAmortizaciones(data){
+            this.tablaAmortizaciones = data
+        },
         setValueRange(data){
             this.formulario.monto_de_dinero_solicitado = data
             this.valueRange = data

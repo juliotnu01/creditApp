@@ -14,4 +14,9 @@ class CreditRequest extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function hasManyAmortizaciones()
+    {
+        return $this->hasMany(Aamortizacion::class, 'credit_request_id');
+    }
 }

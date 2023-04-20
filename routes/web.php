@@ -47,7 +47,7 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
             return Inertia::location('solicitudes-de-creditos', ["isCliente" => $isCliente]);
         }elseif($request->user()->raw_rol == 'cliente'){
             $isCliente = true;
-            return Inertia::render('Dashboard', ["isCliente" => $isCliente]);
+            return Inertia::render('Dashboard', ["isCliente" => $isCliente, "user_id" => $request->user()->id]);
         }
     })->name('dashboard');
     Route::get('/solicitudes-de-creditos', function () {
