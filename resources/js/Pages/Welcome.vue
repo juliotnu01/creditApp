@@ -33,15 +33,13 @@ const valueRange = computed({
 
 const Fecha = moment();
 const openModal = ref(false);
-const ModelTablaCalculo = ref({
-    tipoPago: 'Mensual',
-    pagosMensuales: parseInt(4),
-    periodos: parseInt(16),
-    Meses: 4,
-    InteresMensual: parseFloat(parseFloat(5.81).toFixed(2)),
-    pagoTotal: 0,
-    PagoOla: 0,
-    cuota: 0
+const ModelTablaCalculo = computed({
+    get() {
+        return storeCreditRequest.ModelTablaCalculo
+    },
+    set(val) {
+        storeCreditRequest.setModelTablaCalculo(val)
+    }
 })
 const CalculateMeses = computed({
     get() {
@@ -86,18 +84,7 @@ const formatCurrency = (value) => {
     });
     return formatter.format(value);
 }
-const formattedValue = computed({
-    get() {
-        tablaPrestamo.value[0].valuec = formatCurrency(valueRange.value)
-        return formatCurrency(valueRange.value)
-    },
-    set(value) {
-        // Eliminar los caracteres no numéricos del valor
-        const newValue = value.replace(/[^\d]/g, '')
-        // Actualizar el valor numérico
-        valueRange.value = Number(newValue)
-    }
-})
+
 const tablaPrestamo = ref([
     { cabecera: 'Monto Prestamo' },
     { cabecera: 'Tipo de pago' },
@@ -147,8 +134,14 @@ const quieroMimCredito = async () => {
 }
 
 onMounted(async () => {
-    await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, []);
+    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, []);
+    amortizaciones.value.splice(0, amortizaciones.value.length);
+    for (let index = 0; index < result.length; index++) {
+        const element = result[index];
+        storeCreditRequest.setAmortizaciones(element)
+    }
 })
+
 </script>
 
 <template>
@@ -164,10 +157,6 @@ onMounted(async () => {
                 <Link :href="route('login')"
                     class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
                 Log in</Link>
-
-                <!-- <Link v-if="canRegister" :href="route('register')"
-                                                            class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
-                                                        Register</Link> -->
             </template>
         </div>
 
@@ -197,7 +186,7 @@ onMounted(async () => {
                                 ¿Cuanto dinero necesitas?
                             </h5>
                             <div class="flex justify-end">
-                                <div class="relative mb-3 w-40" >
+                                <div class="relative mb-3 w-40">
                                     <!-- <div class="inline-flex">
                                         {{ formattedValue }}
                                     </div> -->
@@ -205,9 +194,7 @@ onMounted(async () => {
                                         <span
                                             class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
                                             id="basic-addon1">$</span>
-                                        <input type="number"
-                                        v-model="valueRange"
-                                            min="3000"
+                                        <input type="number" v-model="valueRange" min="3000"
                                             class="relative m-0 text-right block w-6 min-w-4 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" />
                                     </div>
@@ -241,6 +228,9 @@ onMounted(async () => {
                                 <div>
                                     <label>Cantidad de Cuotas</label>
                                     <select v-model="ModelTablaCalculo.pagosMensuales" data-te-select-init class="w-full">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
                                         <option value="6">6</option>
@@ -305,7 +295,7 @@ onMounted(async () => {
                                                 <td class="border px-4 py-2">{{ ModelTablaCalculo.tipoPago }}</td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Pagos mensuales</th>
+                                                <th class="px-4 py-2 text-left">Pagos {{ ModelTablaCalculo.tipoPago }}</th>
                                                 <td class="border px-4 py-2 ">
                                                     <p class="ml-3"> {{ ModelTablaCalculo.pagosMensuales }}</p>
                                                 </td>

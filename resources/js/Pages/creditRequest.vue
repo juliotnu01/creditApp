@@ -14,6 +14,14 @@ defineProps({
     laravelVersion: String,
     phpVersion: String,
 });
+const ModelTablaCalculo = computed({
+    get(){
+        return storeCreditRequest.ModelTablaCalculo
+    },
+    set(val){
+        storeCreditRequest.setModelTablaCalculo(val)
+    }
+})
 const amortizaciones = computed({
     get() {
         return storeCreditRequest.amortizaciones
@@ -88,6 +96,14 @@ const enviarCreditRequest = async () => {
         formData.append('numero_curp_obligado', formulario.value.numero_curp_obligado);
         formData.append('domicilio', formulario.value.domicilio);
         formData.append('amortizaciones', JSON.stringify(amortizaciones.value));
+        formData.append('tipo_de_pago', ModelTablaCalculo.value.tipoPago);
+        formData.append('pagos_mensuales', ModelTablaCalculo.value.pagosMensuales);
+        formData.append('numeros_de_periodos', ModelTablaCalculo.value.periodos);
+        formData.append('meses', ModelTablaCalculo.value.Meses);
+        formData.append('interes_mensual', ModelTablaCalculo.value.InteresMensual);
+        formData.append('pago_total', ModelTablaCalculo.value.pagoTotal);
+        formData.append('pago_ola', ModelTablaCalculo.value.PagoOla);
+        formData.append('cuota', ModelTablaCalculo.value.cuota);
         let { data } = await axios.post('/guardar-solicitud-de-credito', formData, { headers: { "Content-Type": "multipart/form-data" } });
         const form = useForm({
             email: data.email,

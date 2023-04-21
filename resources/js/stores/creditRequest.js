@@ -23,7 +23,7 @@ export const useCreditRequest = defineStore('creditRequest', {
             relacion_per_del_titular_del_compro_domicilio_domicilio: '',
             file_caratula_del_estado_de_cuenta: '',
             principal_fuente_de_ingreso_como_piensa_pagar_lo_solicitado: '',
-            cual_es_producto_que_esta_solicitando:'',
+            cual_es_producto_que_esta_solicitando: '',
             escala_de_referencia_gerente_de_cliente_ola: '',
             justificar_la_referencia: '',
             quien_lo_refiere: '',
@@ -41,7 +41,7 @@ export const useCreditRequest = defineStore('creditRequest', {
             file_foto_de_tarjeta: '',
             por_que_no_ha_popido_pagar_su_deuda: '',
             nombre_apellido_del_obligado_solidario: '',
-            telefono_obligado_solidario:'',
+            telefono_obligado_solidario: '',
             correo_obligado_solidario: '',
             nacionalidad_obligado_solidario: '',
             tipo_de_identificacion_oficial: '',
@@ -53,25 +53,39 @@ export const useCreditRequest = defineStore('creditRequest', {
         },
         tablaAmortizaciones: [],
         valueRange: 3000,
+        ModelTablaCalculo: {
+            tipoPago: 'Mensual',
+            pagosMensuales: parseInt(4),
+            periodos: parseInt(16),
+            Meses: 4,
+            InteresMensual: parseFloat(parseFloat(5.9).toFixed(2)),
+            pagoTotal: 0,
+            PagoOla: 0,
+            cuota: 0
+        },
     }),
     getters: {
         getteramortizaciones: (state) => state.amortizaciones,
         getterformulario: (state) => state.formulario,
         gettervalueRange: (state) => state.valueRange,
         gettertablaAmortizaciones: (state) => state.tablaAmortizaciones,
+        getterModelTablaCalculo: (state) => state.ModelTablaCalculo,
     },
     actions: {
-        setTablaAmortizaciones(data){
+        setModelTablaCalculo(data) {
+            this.ModelTablaCalculo = data
+        },
+        setTablaAmortizaciones(data) {
             this.tablaAmortizaciones = data
         },
-        setValueRange(data){
+        setValueRange(data) {
             this.formulario.monto_de_dinero_solicitado = data
             this.valueRange = data
         },
-        setAmortizaciones(data){
-            this.getteramortizaciones.push(data) 
+        setAmortizaciones(data) {
+            this.getteramortizaciones.push(data)
         },
-        setformulario(data){
+        setformulario(data) {
             this.formulario = data
         }
     }

@@ -35,10 +35,30 @@ class AaMortizacioncontroller extends Controller
             return DB::transaction(function () use($request){
                 $aamortizacion = new Aamortizacion();
                 Storage::disk('public')->putFileAs("/documentos/recibos de pagos/$request->uui_credit_request/". substr(Carbon::now(), 0, 10) ."/" , $request->file('recibo_de_pago_user'), $request->file('recibo_de_pago_user')->getClientOriginalName());
-                $urlrecibo_de_pago_user = Storage::disk('public')->url("/documentos/recibos de pago/$request->uui_credit_request/".$request->file('recibo_de_pago_user')->getClientOriginalName());
+                $urlrecibo_de_pago_user = asset(Storage::disk('public')->url("/documentos/recibos de pago/$request->uui_credit_request/".$request->file('recibo_de_pago_user')->getClientOriginalName()));
                 $aamortizacion->find($request->id_recaudo)->update([
                     "ruta_recibo_de_pago" => $urlrecibo_de_pago_user,
                     "status" => 0,
+                ]);
+            });
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function storeFactura(Request $request)
+    {
+        try {
+            return DB::transaction(function () use($request){
+                $aamortizacion = new Aamortizacion();
+                Storage::disk('public')->putFileAs("/documentos/facturas de pagos/$request->uui_credit_request/". substr(Carbon::now(), 0, 10) ."/" , $request->file('factura_de_pago_user'), $request->file('factura_de_pago_user')->getClientOriginalName());
+                $urlfactura_de_pago_user = asset(Storage::disk('public')->url("/documentos/facturas de pago/$request->uui_credit_request/".$request->file('factura_de_pago_user')->getClientOriginalName()));
+                $aamortizacion->find($request->id_recaudo)->update([
+                    "factura_de_recibo_de_pago" => $urlfactura_de_pago_user,
+                    "status" => 1,
                 ]);
             });
         } catch (\Throwable $th) {

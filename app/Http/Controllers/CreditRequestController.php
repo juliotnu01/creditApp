@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Fortify\CreateNewUser;
-use App\Models\{CreditRequest, User, Aamortizacion};
+use App\Models\{CreditRequest, User, Aamortizacion, EstadoCreditoActivo};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use DB;
@@ -19,40 +19,34 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')->get();
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones', 'hasEstadoCredito')->get();
             return response()->json($creditRequest);
-
         } catch (\Throwable $th) {
             throw $th;
         }
-
     }
 
     public function indexHistorialUser($id)
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')
-            ->where('user_id', $id)
-            ->get();
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones', 'hasEstadoCredito')
+                ->where('user_id', $id)
+                ->get();
             return response()->json($creditRequest);
-
         } catch (\Throwable $th) {
             throw $th;
         }
-
     }
     public function indexRecentCreditRequestUser($id)
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones')->where('user_id', $id)->orderBy('id', 'DESC')->first();
+            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones', 'hasEstadoCredito')->where('user_id', $id)->orderBy('id', 'DESC')->first();
             return response()->json($creditRequest);
-
         } catch (\Throwable $th) {
             throw $th;
         }
-
     }
 
     /**
@@ -69,63 +63,61 @@ class CreditRequestController extends Controller
     public function store(Request &$request)
     {
         try {
-            return DB::transaction(function () use ($request){
-                
+            return DB::transaction(function () use ($request) {
+
 
                 $nombreCliente = $request->nombre;
                 $numeroCurp = $request->numero_curp;
 
-                if($request->file_comprobante_ine_identificacion){
+                if ($request->file_comprobante_ine_identificacion) {
                     // file_comprobante_ine_identificacion
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante ine o identificacion/" , $request->file('file_comprobante_ine_identificacion'), $request->file('file_comprobante_ine_identificacion')->getClientOriginalName());
-                    $urlFile_comprobante_ine_identificacion = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante ine o identificacion/".$request->file('file_comprobante_ine_identificacion')->getClientOriginalName());
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante ine o identificacion/", $request->file('file_comprobante_ine_identificacion'), $request->file('file_comprobante_ine_identificacion')->getClientOriginalName());
+                    $urlFile_comprobante_ine_identificacion = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante ine o identificacion/" . $request->file('file_comprobante_ine_identificacion')->getClientOriginalName()));
+                } else {
                     $urlFile_comprobante_ine_identificacion = null;
                 }
 
-                if($request->file_comprobante_domicilio_cliente){
+                if ($request->file_comprobante_domicilio_cliente) {
                     // file_comprobante_domicilio_cliente
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante domicilio cliente/" , $request->file('file_comprobante_domicilio_cliente'), $request->file('file_comprobante_domicilio_cliente')->getClientOriginalName());
-                    $urlfile_comprobante_domicilio_cliente = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante domicilio cliente/".$request->file('file_comprobante_domicilio_cliente')->getClientOriginalName());
-                    
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante domicilio cliente/", $request->file('file_comprobante_domicilio_cliente'), $request->file('file_comprobante_domicilio_cliente')->getClientOriginalName());
+                    $urlfile_comprobante_domicilio_cliente = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante domicilio cliente/" . $request->file('file_comprobante_domicilio_cliente')->getClientOriginalName()));
+                } else {
                     $urlfile_comprobante_domicilio_cliente  = null;
                 }
 
-                if($request->file_caratula_del_estado_de_cuenta){
+                if ($request->file_caratula_del_estado_de_cuenta) {
                     // file_caratula_del_estado_de_cuenta
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/caratula del estado de cuenta/" , $request->file('file_caratula_del_estado_de_cuenta'), $request->file('file_caratula_del_estado_de_cuenta')->getClientOriginalName());
-                    $urlfile_caratula_del_estado_de_cuenta = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/caratula del estado de cuenta/".$request->file('file_caratula_del_estado_de_cuenta')->getClientOriginalName());
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/caratula del estado de cuenta/", $request->file('file_caratula_del_estado_de_cuenta'), $request->file('file_caratula_del_estado_de_cuenta')->getClientOriginalName());
+                    $urlfile_caratula_del_estado_de_cuenta = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/caratula del estado de cuenta/" . $request->file('file_caratula_del_estado_de_cuenta')->getClientOriginalName()));
+                } else {
                     $urlfile_caratula_del_estado_de_cuenta = null;
                 }
 
-                if($request->file_foto_de_tarjeta){
+                if ($request->file_foto_de_tarjeta) {
                     // file_foto_de_tarjeta
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/foto de tarjeta/" , $request->file('file_foto_de_tarjeta'), $request->file('file_foto_de_tarjeta')->getClientOriginalName());
-                    $urlfile_foto_de_tarjeta = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/foto de tarjeta/".$request->file('file_foto_de_tarjeta')->getClientOriginalName());
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/foto de tarjeta/", $request->file('file_foto_de_tarjeta'), $request->file('file_foto_de_tarjeta')->getClientOriginalName());
+                    $urlfile_foto_de_tarjeta = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/foto de tarjeta/" . $request->file('file_foto_de_tarjeta')->getClientOriginalName()));
+                } else {
                     $urlfile_foto_de_tarjeta = null;
                 }
 
-                if($request->file_comprobante_de_domicilio){
+                if ($request->file_comprobante_de_domicilio) {
                     // file_comprobante_ine_o_identificacion_oficial
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante de domicilio/" , $request->file('file_comprobante_ine_o_identificacion_oficial'), $request->file('file_comprobante_ine_o_identificacion_oficial')->getClientOriginalName());
-                    $urlfile_comprobante_ine_o_identificacion_oficial = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante de domicilio/".$request->file('file_comprobante_ine_o_identificacion_oficial')->getClientOriginalName());
-                    
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante de domicilio/", $request->file('file_comprobante_ine_o_identificacion_oficial'), $request->file('file_comprobante_ine_o_identificacion_oficial')->getClientOriginalName());
+                    $urlfile_comprobante_ine_o_identificacion_oficial = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante de domicilio/" . $request->file('file_comprobante_ine_o_identificacion_oficial')->getClientOriginalName()));
+                } else {
                     $urlfile_comprobante_ine_o_identificacion_oficial = null;
                 }
 
-                if($request->file_comprobante_de_domicilio){    
+                if ($request->file_comprobante_de_domicilio) {
                     // file_comprobante_de_domicilio
-                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante de domicilio/" , $request->file('file_comprobante_de_domicilio'), $request->file('file_comprobante_de_domicilio')->getClientOriginalName());
-                    $urlfile_comprobante_de_domicilio = Storage::disk('public')->url("/documentos/clientes/$numeroCurp/". substr(Carbon::now(), 0, 10) ."/$nombreCliente/comprobante de domicilio/".$request->file('file_comprobante_de_domicilio')->getClientOriginalName());
-                }else{
+                    Storage::disk('public')->putFileAs("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante de domicilio/", $request->file('file_comprobante_de_domicilio'), $request->file('file_comprobante_de_domicilio')->getClientOriginalName());
+                    $urlfile_comprobante_de_domicilio = asset(Storage::disk('public')->url("/documentos/clientes/$numeroCurp/" . substr(Carbon::now(), 0, 10) . "/$nombreCliente/comprobante de domicilio/" . $request->file('file_comprobante_de_domicilio')->getClientOriginalName()));
+                } else {
                     $urlfile_comprobante_de_domicilio = null;
                 }
 
-                
+
                 $creditRequest = new CreditRequest();
                 $creditRequest->nombre = $request->nombre;
                 $creditRequest->apellido_paterno = $request->apellido_paterno;
@@ -139,7 +131,7 @@ class CreditRequestController extends Controller
                 $creditRequest->text_comprobante_ine_identificacion = $request->text_comprobante_ine_identificacion;
                 $creditRequest->tipo_identificacion_social = $request->tipo_identificacion_social;
                 $creditRequest->numero_curp = $request->numero_curp;
-                $creditRequest->file_comprobante_domicilio_cliente = $urlfile_comprobante_domicilio_cliente ;
+                $creditRequest->file_comprobante_domicilio_cliente = $urlfile_comprobante_domicilio_cliente;
                 $creditRequest->direccion_domicilio = $request->direccion_domicilio;
                 $creditRequest->relacion_per_del_titular_del_compro_domicilio_cliente = $request->relacion_per_del_titular_del_compro_domicilio_cliente;
                 $creditRequest->relacion_per_del_titular_del_compro_domicilio_domicilio = $request->relacion_per_del_titular_del_compro_domicilio_domicilio;
@@ -167,14 +159,21 @@ class CreditRequestController extends Controller
                 $creditRequest->correo_obligado_solidario = $request->correo_obligado_solidario;
                 $creditRequest->nacionalidad_obligado_solidario = $request->nacionalidad_obligado_solidario;
                 $creditRequest->tipo_de_identificacion_oficial = $request->tipo_de_identificacion_oficial;
-                $creditRequest->file_comprobante_ine_o_identificacion_oficial = $urlfile_comprobante_ine_o_identificacion_oficial ;
+                $creditRequest->file_comprobante_ine_o_identificacion_oficial = $urlfile_comprobante_ine_o_identificacion_oficial;
                 $creditRequest->ine_o_identificacion_oficial = $request->ine_o_identificacion_oficial;
                 $creditRequest->numero_curp_obligado = $request->numero_curp_obligado;
                 $creditRequest->file_comprobante_de_domicilio =  $urlfile_comprobante_de_domicilio;
                 $creditRequest->domicilio = $request->domicilio;
+                $creditRequest->tipo_de_pago = $request->tipo_de_pago;
+                $creditRequest->pagos_mensuales = $request->pagos_mensuales;
+                $creditRequest->numeros_de_periodos = $request->numeros_de_periodos;
+                $creditRequest->meses = $request->meses;
+                $creditRequest->interes_mensual = $request->interes_mensual;
+                $creditRequest->pago_total = $request->pago_total;
+                $creditRequest->pago_ola = $request->pago_ola;
+                $creditRequest->cuota = $request->cuota;
+                
                 $creditRequest->uui = (string) Str::uuid();
-
-
 
                 $credenciales = [
                     "name" => $request->nombre,
@@ -192,10 +191,18 @@ class CreditRequestController extends Controller
                 $user = User::where('email', $request->correo)->first();
                 $creditRequest->user_id = $user->id;
                 $creditRequest->save();
-                
-                
+
+                $estadoCredito = new EstadoCreditoActivo();
+                $estadoCredito->create(["estado_de_evaluacion" => 0, 
+                                        "estado_propuesta" => 0, 
+                                        "estado_carta_de_aceptacion" => 0, 
+                                        "estado_en_contrato" => 0, 
+                                        "estado_liberado" => 0, 
+                                        "estado_pagado" => 0,
+                                        "credit_request_id" => $creditRequest->id]);
+
                 $amortizaicones = json_decode($request->amortizaciones);
-                for ($i=0; $i < count($amortizaicones) ; $i++) { 
+                for ($i = 0; $i < count($amortizaicones); $i++) {
                     $element  = $amortizaicones[$i];
                     $amort = new Aamortizacion();
                     $amort->periodo = $element->periodo;
@@ -216,7 +223,7 @@ class CreditRequestController extends Controller
 
     public function enviarCreditoAEstudio(Request $request)
     {
-        return DB::transaction(function () use($request) {
+        return DB::transaction(function () use ($request) {
             $SolicitudDeCredito = new CreditRequest();
             $SolicitudDeCredito->find($request->id_credito)->update([
                 "status" => 1
@@ -225,7 +232,7 @@ class CreditRequestController extends Controller
     }
     public function rechazarCredito(Request $request)
     {
-        return DB::transaction(function () use($request) {
+        return DB::transaction(function () use ($request) {
             $SolicitudDeCredito = new CreditRequest();
             $SolicitudDeCredito->find($request->id_credito)->update([
                 "status" => 2

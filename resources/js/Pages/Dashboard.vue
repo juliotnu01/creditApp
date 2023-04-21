@@ -10,12 +10,12 @@ const props = defineProps({
 });
 const estadoCupoDisponible = ref([
     { text: 'Estado de evaluacion', value: 0, color: 0 }, // 0: gris  1: verde 
-    { text: 'Credito estado de propuesta', value: 1, color: 0 }, // 0: gris  1: verde 
-    { text: 'Credito en carta de aceptación', value: 2, color: 1 }, // 0: gris  1: verde 
-    { text: 'Credito en contrato', value: 4, color: 0 }, // 0: gris  1: verde 
-    { text: 'Credito liberao', value: 5, color: 1 }, // 0: gris  1: verde 
-    { text: 'Credito Rebotó', value: 6, color: 0 }, // 0: gris  1: verde 
-    { text: 'Credito Pagado', value: 7, color: 0 }, // 0: gris  1: verde 
+    { text: 'Credito estado de propuesta', value: 0, color: 0 }, // 0: gris  1: verde 
+    { text: 'Credito en carta de aceptación', value: 0, color: 1 }, // 0: gris  1: verde 
+    { text: 'Credito en contrato', value: 0, color: 0 }, // 0: gris  1: verde 
+    { text: 'Credito liberao', value: 0, color: 1 }, // 0: gris  1: verde 
+    { text: 'Credito Rebotó', value: 0, color: 0 }, // 0: gris  1: verde 
+    { text: 'Credito Pagado', value: 0, color: 0 }, // 0: gris  1: verde 
 ])
 const openHistorialUser = ref(false);
 const openRecaudosCreditRequestUser = ref(false);
@@ -24,7 +24,7 @@ const dataCreditRequest = ref([]);
 const amortizacionesCreditRequest = ref([]);
 const RecentCreditRequest = ref(null);
 const reciboDePAgoUser = ref(null);
-const recaudo = ref(ref);
+const recaudo = ref(null);
 const getHistorialUser = async () => {
     try {
         let { data } = await axios(`/api/get-historial-user/${props.user_id}`)
@@ -54,7 +54,13 @@ const getRecentCreditRequestUser = async () => {
     try {
         let { data } = await axios(`/api/get-recent-credit-request/${props.user_id}`)
         RecentCreditRequest.value = data
-        SaldoEnCreditosActivos.value =  data.monto_de_dinero_solicitado
+        estadoCupoDisponible.value[0].value = data.has_estado_credito.estado_de_evaluacion
+        estadoCupoDisponible.value[1].value = data.has_estado_credito.estado_propuesta
+        estadoCupoDisponible.value[2].value = data.has_estado_credito.estado_carta_de_aceptacion
+        estadoCupoDisponible.value[3].value = data.has_estado_credito.estado_en_contrato
+        estadoCupoDisponible.value[4].value = data.has_estado_credito.estado_liberado
+        estadoCupoDisponible.value[6].value = data.has_estado_credito.estado_pagado
+        SaldoEnCreditosActivos.value = data.monto_de_dinero_solicitado
         amortizacionesCreditRequest.value = data.has_many_amortizaciones
     } catch (error) {
         console.log(error)
@@ -79,6 +85,7 @@ const EnviarReciboDePagoARecaudo = async () => {
 
         await axios.post('/api/add-recibo-de-pago-user', formData, { headers: { "Content-Type": "multipart/form-data" } })
         openReciboPagoCreditRequestUser.value = false
+        getRecentCreditRequestUser();
 
     } catch (error) {
         console.log(error)
@@ -127,7 +134,7 @@ onBeforeMount(() => {
                             <p class="flex items-center text-gray-600 mb-2" v-for="(estado, n) in estadoCupoDisponible"
                                 :key="n">
                                 <span
-                                    :class="{ 'w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0': !estado.color, 'w-4 h-4 mr-2 inline-flex items-center justify-center bg-green-400 text-white rounded-full flex-shrink-0': estado.color }">
+                                    :class="{ 'w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0': !estado.value, 'w-4 h-4 mr-2 inline-flex items-center justify-center bg-green-400 text-white rounded-full flex-shrink-0': estado.value }">
                                     <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2.5" class="w-3 h-3" viewBox="0 0 24 24">
                                         <path d="M20 6L9 17l-5-5"></path>
@@ -352,38 +359,43 @@ onBeforeMount(() => {
                                                     </svg>
                                                 </div>
                                                 <div class="w-4 mr-2 transform  hover:scale-110">
-                                                    <svg width="15px" height="15px" viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <title />
-                                                        <g id="Complete">
-                                                            <g id="download">
-                                                                <g>
-                                                                    <path d="M3,12.3v7a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2v-7"
-                                                                        fill="none" stroke="#000000" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2" />
+                                                    <a :href="pago.factura_de_recibo_de_pago" target="_blank" class="flex items-center text-gray-600 mb-2">
+                                                        <svg width="15px" height="15px" viewBox="0 0 24 24"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <title />
+                                                            <g id="Complete">
+                                                                <g id="download">
                                                                     <g>
-                                                                        <polyline data-name="Right" fill="none" id="Right-2"
-                                                                            points="7.9 12.3 12 16.3 16.1 12.3"
-                                                                            stroke="#000000" stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2" />
-
-                                                                        <line fill="none" stroke="#000000"
+                                                                        <path
+                                                                            d="M3,12.3v7a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2v-7"
+                                                                            fill="none" stroke="#000000"
                                                                             stroke-linecap="round" stroke-linejoin="round"
-                                                                            stroke-width="2" x1="12" x2="12" y1="2.7"
-                                                                            y2="14.2" />
+                                                                            stroke-width="2" />
+                                                                        <g>
+                                                                            <polyline data-name="Right" fill="none"
+                                                                                id="Right-2"
+                                                                                points="7.9 12.3 12 16.3 16.1 12.3"
+                                                                                stroke="#000000" stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2" />
+
+                                                                            <line fill="none" stroke="#000000"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                x1="12" x2="12" y1="2.7" y2="14.2" />
+                                                                        </g>
                                                                     </g>
                                                                 </g>
                                                             </g>
-                                                        </g>
-                                                    </svg>
+                                                        </svg>
+                                                    </a>
                                                 </div>
                                                 <div class="w-4 mr-2 transform  hover:scale-110">
                                                     <p class="flex items-center text-gray-600 mb-2">
                                                         <span :class="{
                                                             'w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0': pago.status == null,
                                                             'w-4 h-4 mr-2 inline-flex items-center justify-center bg-yellow-400 text-black rounded-full flex-shrink-0': pago.status == 0,
-                                                            'w-4 h-4 mr-2 inline-flex items-center justify-center bg-red-400 text-white rounded-full flex-shrink-0': pago.status == 1,
-                                                            'w-4 h-4 mr-2 inline-flex items-center justify-center bg-green-400 text-white rounded-full flex-shrink-0': pago.status == 2
+                                                            'w-4 h-4 mr-2 inline-flex items-center justify-center bg-green-400 text-white rounded-full flex-shrink-0': pago.status == 1,
+                                                            'w-4 h-4 mr-2 inline-flex items-center justify-center bg-red-400 text-white rounded-full flex-shrink-0': pago.status == 2
                                                         }">
                                                             <svg fill="none" stroke="currentColor" stroke-linecap="round"
                                                                 stroke-linejoin="round" stroke-width="2.5" class="w-3 h-3"
@@ -442,5 +454,4 @@ onBeforeMount(() => {
                 </div>
             </template>
         </modal>
-    </AppLayout>
-</template>
+    </AppLayout></template>

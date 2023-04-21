@@ -19,4 +19,8 @@ class CreditRequest extends Model
     {
         return $this->hasMany(Aamortizacion::class, 'credit_request_id');
     }
+    public function hasEstadoCredito()
+    {
+        return $this->hasOne(EstadoCreditoActivo::class, 'credit_request_id');
+    }
 }
