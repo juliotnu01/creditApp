@@ -18,7 +18,7 @@ use App\Http\Controllers\{CreditRequestController, AaMortizacioncontroller};
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-credit-request',[CreditRequestController::class, 'index'])->name('get.credit.request');
     Route::post('/enviar-credito-a-estudio',[CreditRequestController::class, 'enviarCreditoAEstudio'])->name('enviar.credito.a.estuidio');
     Route::post('/rechazar-credito',[CreditRequestController::class, 'rechazarCredito'])->name('rechazar.credito');
@@ -27,6 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/add-recibo-de-pago-user',[AaMortizacioncontroller::class, 'store'])->name('add.recibo.de.pago.user');
     Route::post('/add-factura-de-pago-user',[AaMortizacioncontroller::class, 'storeFactura'])->name('add.factura.de.pago.user');
     Route::post('/recalcular-amortizaciones',[AaMortizacioncontroller::class, 'recalcularAmortizaciones'])->name('recalcular.amortizaciones');
-});
+// });
 
 
