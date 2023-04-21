@@ -97,4 +97,29 @@ class AaMortizacioncontroller extends Controller
     {
         //
     }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function recalcularAmortizaciones(Request $request)
+    {
+        try {
+            Aamortizacion::where('uui_credit_request', $request->uui_credit_request)->delete();
+            for ($i = 0; $i < count($request->amortizaciones); $i++) {
+                $element  = $request->amortizaciones[$i];
+                
+                $amort = new Aamortizacion();
+                $amort->periodo = $element['periodo'];
+                $amort->interes = $element['interes'];
+                $amort->capital = $element['capital'];
+                $amort->pago = $element['pago'];
+                $amort->dias_pago = Carbon::createFromFormat('d \d\e F \d\e\l Y',$element['dias_pago'])->format('Y-m-d');
+                $amort->uui_credit_request = $request['uui_credit_request'];
+                $amort->credit_request_id = $request['credit_request_id'];
+                $amort->save();
+            }
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

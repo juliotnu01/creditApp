@@ -194,7 +194,7 @@ const RecalcularCredito = async () => {
         const element = result[index];
         amortizaciones.value.push(element)
     }
-    openModal.value = true
+    axios.post('/api/recalcular-amortizaciones', {uui_credit_request: formulario.value.uui, credit_request_id: formulario.value.id, amortizaciones:amortizaciones.value})
 }
 onMounted(() => {
     getSolicitudesDeCreditos()
@@ -889,31 +889,95 @@ onMounted(() => {
                                         <tbody>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Estado de evaluacion</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_de_evaluacion"
+                                                        :checked="formulario.has_estado_credito.estado_de_evaluacion == 1 ? 'checked' : false"
+                                                        class="mr-4 checked mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_de_evaluacion ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito estado de propuesta</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_propuesta"
+                                                        :checked="formulario.has_estado_credito.estado_propuesta == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_propuesta ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito en carta de aceptación</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_carta_de_aceptacion"
+                                                        :checked="formulario.has_estado_credito.estado_carta_de_aceptacion == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_carta_de_aceptacion ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito en contrato</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_en_contrato"
+                                                        :checked="formulario.has_estado_credito.estado_en_contrato == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_en_contrato ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito liberao</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_liberado"
+                                                        :checked="formulario.has_estado_credito.estado_liberado == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_liberado ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito Rebotó</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.reboto"
+                                                        :checked="formulario.has_estado_credito.reboto == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.reboto ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th class="px-4 py-2 text-left">Credito Pagado</th>
-                                                <td class="border px-4 py-2"> {{ formatCurrency(MontoPrestamo) }}</td>
+                                                <td class="border px-4 py-2">
+                                                    <input
+                                                        v-if="formulario.hasOwnProperty('has_estado_credito')"
+                                                        v-model="formulario.has_estado_credito.estado_pagado"
+                                                        :checked="formulario.has_estado_credito.estado_pagado == 1 ? true : false"
+                                                        class="mr-4 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-neutral-600 dark:after:bg-neutral-400 dark:checked:bg-primary dark:checked:after:bg-primary dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca]"
+                                                        type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                                                        for="flexSwitchCheckDefault">{{formulario.has_estado_credito.estado_pagado ? 'Aprobado': ''}}</label>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

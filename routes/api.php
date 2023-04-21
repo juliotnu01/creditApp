@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-recent-credit-request/{id}',[CreditRequestController::class, 'indexRecentCreditRequestUser'])->name('get.recent.credit.request');
     Route::post('/add-recibo-de-pago-user',[AaMortizacioncontroller::class, 'store'])->name('add.recibo.de.pago.user');
     Route::post('/add-factura-de-pago-user',[AaMortizacioncontroller::class, 'storeFactura'])->name('add.factura.de.pago.user');
+    Route::post('/recalcular-amortizaciones',[AaMortizacioncontroller::class, 'recalcularAmortizaciones'])->name('recalcular.amortizaciones');
 });
 
 
