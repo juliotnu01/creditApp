@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, router } from "@inertiajs/vue3";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch} from "vue";
 import modal from "../Components/DialogModal.vue";
 import moment from "moment";
 import { useCreditRequest } from '../stores/creditRequest'
@@ -30,8 +30,8 @@ const valueRange = computed({
         storeCreditRequest.setValueRange(val)
     }
 })
-
 const Fecha = ref(null);
+const fechaParaAgregar = ref(31);
 const openModal = ref(false);
 const ModelTablaCalculo = computed({
     get() {
@@ -94,7 +94,7 @@ const tablaPrestamo = ref([
     { cabecera: 'Pago Total' },
     { cabecera: 'Pago OLA' },
 ]);
-const calcularTabla = (capitalInicial, interes, pago, tabla) => {
+const calcularTabla = (capitalInicial, interes, pago, tabla, diasFecha) => {
     // Si el capital es menor o igual que cero, detenemos la recursión
     if (capitalInicial <= 0) {
         return tabla;
@@ -109,14 +109,14 @@ const calcularTabla = (capitalInicial, interes, pago, tabla) => {
         capital: capitalInicial,
         interes: interes,
         pago: pago,
-        dias_pago: Fecha.value.add(7, 'days').format('Do [de] MMMM [del] YYYY').replace(/\b(\d{1,2})(th|st|nd|rd)\b/g, '$1')
+        dias_pago: Fecha.value.add(diasFecha, 'days').format('Do [de] MMMM [del] YYYY').replace(/\b(\d{1,2})(th|st|nd|rd)\b/g, '$1')
     });
     // Llamamos recursivamente la función con el nuevo capital
-    return calcularTabla(nuevoCapital, interes, pago, tabla);
+    return calcularTabla(nuevoCapital, interes, pago, tabla, diasFecha);
 }
 const openSimuladorDeCredito = async () => {
     Fecha.value = moment();
-    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, []);
+    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
     amortizaciones.value.splice(0, amortizaciones.value.length);
     for (let index = 0; index < result.length; index++) {
         const element = result[index];
@@ -131,10 +131,26 @@ const quieroMimCredito = async () => {
         console.log(error)
     }
 }
+watch(() => ModelTablaCalculo, (newValue, oldValue) => {
+    switch (newValue.value.tipoPago) {
+        case "mensual":
+            newValue.value.pagosMensuales = 1
+            fechaParaAgregar.value = 31;
+            break
+        case "quincenal":
+            newValue.value.pagosMensuales = 2
+            fechaParaAgregar.value = 15;
+            break
+        default:
+            newValue.value.pagosMensuales = 1
+            fechaParaAgregar.value = 31;
+            break
+    }
 
+}, { deep: true })
 onMounted(async () => {
     Fecha.value = moment();
-    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, []);
+    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
     amortizaciones.value.splice(0, amortizaciones.value.length);
     for (let index = 0; index < result.length; index++) {
         const element = result[index];
@@ -213,20 +229,17 @@ onMounted(async () => {
                                     <div>
                                         <label data-te-select-label-ref>Frecuencia de pagos</label>
                                         <select v-model="ModelTablaCalculo.tipoPago" class="w-full">
-                                            <option value="Mensual">
+                                            <option value="mensual">
                                                 Mensual
                                             </option>
                                             <option value="quincenal">
                                                 Quincenal
                                             </option>
-                                            <option value="semanal">
-                                                Semanal
-                                            </option>
                                         </select>
                                     </div>
                                     <div>
                                         <label>Cantidad de Cuotas</label>
-                                        <select v-model="ModelTablaCalculo.pagosMensuales" data-te-select-init
+                                        <select disabled v-model="ModelTablaCalculo.pagosMensuales" data-te-select-init
                                             class="w-full">
                                             <option value="1">1</option>
                                             <option value="2">2</option>
@@ -282,7 +295,7 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </div>
-                        <!-- <div class="p-6 bg-white"> -->
+
                         <section class="antialiased ">
                             <div class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200">
                                 <div class="overflow-x-auto p-3">
@@ -311,8 +324,7 @@ onMounted(async () => {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left capitalize">{{ ModelTablaCalculo.tipoPago
-                                                }}</th>
+                                                <th class="px-4 py-2 text-left capitalize">Meses</th>
                                                 <td class="border px-4 py-2">
                                                     <p class="ml-3">{{ CalculateMeses }}</p>
                                                 </td>
@@ -375,7 +387,6 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </section>
-                        <!-- </div> -->
                     </div>
                 </div>
 
@@ -497,4 +508,5 @@ onMounted(async () => {
     .dark\:bg-dots-lighter {
         background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
     }
-}</style>
+}
+</style>
