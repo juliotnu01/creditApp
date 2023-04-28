@@ -58,7 +58,7 @@ export const useCreditRequest = defineStore('creditRequest', {
             pagosMensuales: parseInt(4),
             periodos: parseInt(16),
             Meses: 4,
-            InteresMensual: parseFloat(parseFloat(5.9).toFixed(2)),
+            InteresMensual: parseFloat(parseFloat(5.93).toFixed(2)),
             pagoTotal: 0,
             PagoOla: 0,
             cuota: 0
