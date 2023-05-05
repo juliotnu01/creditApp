@@ -53,4 +53,7 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
     Route::get('/solicitudes-de-creditos', function () {
         return Inertia::render('HistorialCreditRequest/index');
     })->name('credits.requests');
+    Route::get('/usuarios', function () {
+        return Inertia::render('Usuarios/index');
+    })->name('usuarios');
 });

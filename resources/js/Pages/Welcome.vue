@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, router } from "@inertiajs/vue3";
-import { ref, computed, onMounted, watch} from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import modal from "../Components/DialogModal.vue";
 import moment from "moment";
 import { useCreditRequest } from '../stores/creditRequest'
@@ -141,6 +141,10 @@ watch(() => ModelTablaCalculo, (newValue, oldValue) => {
             newValue.value.pagosMensuales = 2
             fechaParaAgregar.value = 15;
             break
+        case "semanal":
+            newValue.value.pagosMensuales = 4
+            fechaParaAgregar.value = 7;
+            break
         default:
             newValue.value.pagosMensuales = 1
             fechaParaAgregar.value = 31;
@@ -216,15 +220,14 @@ onMounted(async () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <input v-model="valueRange" min="3000" max="100000" type="range"
+                                    <input v-model="valueRange" min="3000" max="50000" type="range"
                                         class="transparent h-1.5 w-full cursor-pointer appearance-none rounded-lg border-transparent bg-neutral-200"
                                         id="customRange1" />
                                 </div>
                                 <div class="flex justify-between">
                                     <div>$3.000,00</div>
-                                    <div>$100.000,00</div>
+                                    <div>$50.000,00</div>
                                 </div>
-
                                 <div class="flex justify-between gap-1 my-2 ">
                                     <div>
                                         <label data-te-select-label-ref>Frecuencia de pagos</label>
@@ -235,26 +238,16 @@ onMounted(async () => {
                                             <option value="quincenal">
                                                 Quincenal
                                             </option>
+                                            <option value="semanal">
+                                                Semanal
+                                            </option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label>Cantidad de Cuotas</label>
-                                        <select disabled v-model="ModelTablaCalculo.pagosMensuales" data-te-select-init
-                                            class="w-full">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                            <option value="6">6</option>
-                                            <option value="7">7</option>
-                                            <option value="8">8</option>
-                                            <option value="9">9</option>
-                                            <option value="10">10</option>
-                                        </select>
+                                        <label> Números de periodos</label>
+                                        <input min="0" v-model="ModelTablaCalculo.periodos" type="number" class="bg-transparent block border-2 peer px-3 w-full" />
                                     </div>
                                 </div>
-
                                 <div class="flex justify-between my-2 gap-2">
                                     <div class="block rounded-lg bg-white text-center dark:bg-neutral-700">
                                         <div
@@ -295,42 +288,34 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </div>
-
                         <section class="antialiased ">
                             <div class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200">
                                 <div class="overflow-x-auto p-3">
-                                    <table class="table-auto">
+                                    <table class="table-auto w-3/4">
                                         <tbody>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Monto Prestamo</th>
+                                                <th class="px-4 w-2/4 py-2 text-left">Monto Prestamo</th>
                                                 <td class="border px-4 py-2"> {{ formatCurrency(valueRange) }}</td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Tipo de pago</th>
+                                                <th class="px-4 w-2/4 py-2 text-left">Tipo de pago</th>
                                                 <td class="border px-4 py-2">{{ ModelTablaCalculo.tipoPago }}</td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Pagos {{ ModelTablaCalculo.tipoPago }}
+                                                <th class="px-4 w-2/4 py-2 text-left">Pagos {{ ModelTablaCalculo.tipoPago }}
                                                 </th>
                                                 <td class="border px-4 py-2 ">
                                                     <p class="ml-3"> {{ ModelTablaCalculo.pagosMensuales }}</p>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Números de periodos</th>
-                                                <td class="border px-4 py-2">
-                                                    <input min="0" v-model="ModelTablaCalculo.periodos" type="number"
-                                                        class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary " />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="px-4 py-2 text-left capitalize">Meses</th>
+                                                <th class="px-4 w-2/4 py-2 text-left capitalize">Meses</th>
                                                 <td class="border px-4 py-2">
                                                     <p class="ml-3">{{ CalculateMeses }}</p>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Interés mensual</th>
+                                                <th class="px-4 w-2/4 py-2 text-left">Interés mensual</th>
                                                 <td class="border px-4 py-2">
                                                     <div class="relative flex flex-wrap items-stretch">
                                                         <input type="nunmber" v-model="ModelTablaCalculo.InteresMensual"
@@ -344,7 +329,7 @@ onMounted(async () => {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Pago Total</th>
+                                                <th class="px-4 w-2/4 py-2 text-left">Pago Total</th>
                                                 <td class="border px-4 py-2">
                                                     <div class="relative flex flex-wrap items-stretch">
                                                         <input type="nunmber" v-model="CalculatePagoTotal"
@@ -358,7 +343,7 @@ onMounted(async () => {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="px-4 py-2 text-left">Pago OLA</th>
+                                                <th class="px-4 w-2/4 py-2 text-left">Pago OLA</th>
                                                 <td class="border px-4 py-2">{{ formatCurrency(CalculatePagoOla) }}</td>
                                             </tr>
                                         </tbody>

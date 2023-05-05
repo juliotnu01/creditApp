@@ -2,7 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{CreditRequestController, AaMortizacioncontroller};
+use App\Http\Controllers\{  CreditRequestController, 
+                            AaMortizacioncontroller,
+                            UserController,
+                            MensajeController};
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 // Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/get-users',[UserController::class, 'index'])->name('get.users');
     Route::get('/get-credit-request',[CreditRequestController::class, 'index'])->name('get.credit.request');
     Route::post('/enviar-credito-a-estudio',[CreditRequestController::class, 'enviarCreditoAEstudio'])->name('enviar.credito.a.estuidio');
     Route::post('/rechazar-credito',[CreditRequestController::class, 'rechazarCredito'])->name('rechazar.credito');
@@ -27,6 +31,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/add-recibo-de-pago-user',[AaMortizacioncontroller::class, 'store'])->name('add.recibo.de.pago.user');
     Route::post('/add-factura-de-pago-user',[AaMortizacioncontroller::class, 'storeFactura'])->name('add.factura.de.pago.user');
     Route::post('/recalcular-amortizaciones',[AaMortizacioncontroller::class, 'recalcularAmortizaciones'])->name('recalcular.amortizaciones');
+    Route::post('/send-new-mensaje',[MensajeController::class, 'store'])->name('send.new.mensaje');
+    Route::get('/get-mensajes',[MensajeController::class, 'index'])->name('get.mensajes');
+    Route::post('/responder-mensajes',[MensajeController::class, 'ResponderMensaje'])->name('responder.mensaje');
 // });
 
 
