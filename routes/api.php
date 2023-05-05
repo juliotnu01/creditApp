@@ -23,6 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 // Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-users',[UserController::class, 'index'])->name('get.users');
+    Route::get('/get-users-clientes',[UserController::class, 'indexClientes'])->name('get.users.cliente');
+    Route::post('/create-new-cliente',[UserController::class, 'create'])->name('create.new.cliente');
+    Route::get('/view-cliente/{id}',[UserController::class, 'viewCliente'])->name('view.cliente');
+    Route::post('/edit-cliente/{id}',[UserController::class, 'update'])->name('edit.cliente');
     Route::get('/get-credit-request',[CreditRequestController::class, 'index'])->name('get.credit.request');
     Route::post('/enviar-credito-a-estudio',[CreditRequestController::class, 'enviarCreditoAEstudio'])->name('enviar.credito.a.estuidio');
     Route::post('/rechazar-credito',[CreditRequestController::class, 'rechazarCredito'])->name('rechazar.credito');

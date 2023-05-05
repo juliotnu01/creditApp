@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Laravel\Jetstream\Jetstream;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Fortify\Rules\Password;
+use DB;
 
 class UserController extends Controller
 {
@@ -15,8 +20,28 @@ class UserController extends Controller
     {
         try {
             
-            $users = User::where('id', "<>", Auth()->user()->id )->get();
+            $users = User::with('hasManyCreditsRequests')->where('id', "<>", Auth()->user()->id )->get();
             return response()->json($users);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function indexClientes()
+    {
+        try {
+            
+            $users = User::with('hasManyCreditsRequests')->where('id', "<>", Auth()->user()->id )->where('raw_rol', 'cliente')->get();
+            return response()->json($users);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function viewCliente($id)
+    {
+        try {
+            
+            $user = User::with('hasManyCreditsRequests')->where('id', $id )->first();
+            return response()->json($user);
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -25,9 +50,23 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        Validator::make($request->toArray(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', new Password, 'confirmed'],
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+        ])->validate();
+
+        return DB::transaction(function () use ($request) {
+            return User::create([
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'password' => Hash::make($request['password']),
+                'raw_rol' => $request['raw_rol'] ?? 'admin'
+            ]);
+        });
     }
 
     /**
@@ -57,9 +96,17 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        //
+        
+        return DB::transaction(function () use ($request, $id) {
+            return User::find($id)->update([
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'password' => Hash::make($request['password']) ,
+                'raw_rol' => $request['raw_rol'] 
+            ]);
+        });
     }
 
     /**

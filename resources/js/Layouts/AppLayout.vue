@@ -260,14 +260,13 @@ const logout = () => {
                             </form>
 
                             <!-- Team Management -->
-                            <template v-if="$page.props.jetstream.hasTeamFeatures">
+                            <!-- <template v-if="$page.props.jetstream.hasTeamFeatures">
                                 <div class="border-t border-gray-200" />
 
                                 <div class="block px-4 py-2 text-xs text-gray-400">
                                     Manage Team
                                 </div>
 
-                                <!-- Team Settings -->
                                 <ResponsiveNavLink :href="route('teams.show', $page.props.auth.user.current_team)"
                                     :active="route().current('teams.show')">
                                     Team Settings
@@ -278,7 +277,6 @@ const logout = () => {
                                     Create New Team
                                 </ResponsiveNavLink>
 
-                                <!-- Team Switcher -->
                                 <template v-if="$page.props.auth.user.all_teams.length > 1">
                                     <div class="border-t border-gray-200" />
 
@@ -303,7 +301,7 @@ const logout = () => {
                                         </form>
                                     </template>
                                 </template>
-                            </template>
+                            </template> -->
                         </div>
                     </div>
                 </div>
@@ -320,7 +318,7 @@ const logout = () => {
                 <!-- Content -->
                 <div class="flex-1 relative p-8">
                     <main>
-                        <div class="fixed bottom-4 right-4">
+                        <!-- <div class="fixed bottom-4 right-4">
                             <button @click.prevent="isOpen = true"
                                 class="bg-blue-500 hover:bg-blue-600 rounded-full p-3 shadow-lg">
                                 <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
@@ -335,7 +333,7 @@ const logout = () => {
                                 <span
                                     class="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs p-1 animate-ping"></span>
                             </button>
-                        </div>
+                        </div> -->
 
                         <slot />
                     </main>
