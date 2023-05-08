@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{  CreditRequestController, 
                             AaMortizacioncontroller,
                             UserController,
-                            MensajeController};
+                            MensajeController,
+                            BancoDeDatosController};
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/send-new-mensaje',[MensajeController::class, 'store'])->name('send.new.mensaje');
     Route::get('/get-mensajes',[MensajeController::class, 'index'])->name('get.mensajes');
     Route::post('/responder-mensajes',[MensajeController::class, 'ResponderMensaje'])->name('responder.mensaje');
+    Route::post('/add-upload-file-json',[BancoDeDatosController::class, 'saveUploadJson'])->name('add.upload.file.json');
+    Route::get('/get-banco-de-datos',[BancoDeDatosController::class, 'index'])->name('get.banco.de.datos');
 // });
 
 

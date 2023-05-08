@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\{{modelName}};
+use Illuminate\Support\Facades\Hash;
+
+class {{modelName}}Service
+{
+    protected $modelClass = {{modelName}}::class;
+
+    public $model;
+
+    public function __construct()
+    {
+        $this->model = new $this->modelClass;
+    }
+
+    public function store($attribute)
+    {
+        $attribute['password'] = Hash::make($attribute['password']);
+        ${{modelName}} = $this->model->newInstance($attribute);
+        ${{modelName}}->save();
+        return ${{modelName}};
+    }
+}

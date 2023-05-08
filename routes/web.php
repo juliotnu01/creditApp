@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CreditRequestController;
 use Symfony\Component\HttpFoundation\Request;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 |
 */
 
+
+
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -25,6 +27,8 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Route::post('/login-user', Fortify::authenticateUsing([new UserController, '__invoke']) )->name('user.login');
 
 Route::get('/credit-request', function () {
     return Inertia::render('creditRequest',[
@@ -41,7 +45,6 @@ Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 's
 Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
     
     Route::get('/dashboard', function (Request $request) {
-        // dd($request->user());
         if($request->user()->raw_rol == 'admin'){
             $isCliente = false;
             return Inertia::location('solicitudes-de-creditos', ["isCliente" => $isCliente]);
@@ -50,10 +53,17 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
             return Inertia::render('Dashboard', ["isCliente" => $isCliente, "user_id" => $request->user()->id]);
         }
     })->name('dashboard');
+    
     Route::get('/solicitudes-de-creditos', function () {
         return Inertia::render('HistorialCreditRequest/index');
     })->name('credits.requests');
+
     Route::get('/usuarios', function () {
         return Inertia::render('Usuarios/index');
     })->name('usuarios');
+
+    Route::get('/banco-de-datos', function () {
+        return Inertia::render('BancoDeDatos/index');
+    })->name('banco.de.datos');
+    
 });
