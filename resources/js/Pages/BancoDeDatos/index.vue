@@ -214,12 +214,6 @@ onMounted(() => {
                                 <span>{{ data.hace_cuanto_tiene_ese_dinero }}</span>
                             </td>
                             <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_la_razon_por_la_que_tiene_esa_deuda }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.hace_cuanto_tiene_ese_dinero }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
                                 <span>{{ data.a_que_instucion_le_debe_dinero }}</span>
                             </td>
                             <td class="py-3 px-6 text-center">

@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/responder-mensajes',[MensajeController::class, 'ResponderMensaje'])->name('responder.mensaje');
     Route::post('/add-upload-file-json',[BancoDeDatosController::class, 'saveUploadJson'])->name('add.upload.file.json');
     Route::get('/get-banco-de-datos',[BancoDeDatosController::class, 'index'])->name('get.banco.de.datos');
+    Route::post('/asociardar-datos-a-usuario',[BancoDeDatosController::class, 'asociarDocumento'])->name('asociar.datos.a.usuario');
 // });
 
 

@@ -64,4 +64,17 @@ class BancoDeDatosController extends Controller
             throw $th;
         }
     }
+
+    public function asociarDocumento(Request $request)
+    {
+        try {
+            $banDeDato = New BancoDeDatos();
+            $banDeDato->find($request['doc']['id'])->update([
+                "user_id" => $request['user']['id']
+            ]);
+            return response()->json(['mensaje' => 'Documento asociado con exito']);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

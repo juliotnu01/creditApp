@@ -82,6 +82,11 @@ const logout = () => {
                                     Banco de datos
                                 </NavLink>
                             </div>
+                            <div v-if="!isCliente" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <NavLink :href="route('crear.creditos')" :active="route().current('crear.creditos')">
+                                    Crear Creditos
+                                </NavLink>
+                            </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ml-6">

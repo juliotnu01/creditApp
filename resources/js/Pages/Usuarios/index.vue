@@ -10,9 +10,19 @@ defineProps({
 });
 
 const usuarios = ref([]);
+const BancoDeDatos = ref([]);
 const openModalAddUser = ref(false);
 const openModalviewUser = ref(false);
 const openModalEditUser = ref(false);
+const openModalOpenInfoCliente = ref(false);
+const results = ref([]);
+const resultsBancoDeDatos = ref([]);
+const filteredResults = ref([]);
+const filteredResultsBancoDeDatos = ref([]);
+const searchTerm = ref('');
+const searchBancoDeDatos = ref('');
+const documentSelected = ref(null);
+
 const modelUser = ref({
     name: '',
     email: '',
@@ -38,16 +48,24 @@ const modelEditView = ref({
     raw_rol: 'cliente',
     terms: false,
 });
-
 const getUsuarios = async () => {
     try {
         let { data } = await axios('/api/get-users-clientes');
         usuarios.value = data
+        results.value = data
     } catch (error) {
         console.log(error)
     }
 }
-
+const getBancoDeDatos = async () => {
+    try {
+        let { data } = await axios('/api/get-banco-de-datos');
+        BancoDeDatos.value = data
+        resultsBancoDeDatos.value = data
+    } catch (error) {
+        console.log(error)
+    }
+}
 const addUser = async () => {
     try {
         await axios.post(route('create.new.cliente'), modelUser.value)
@@ -65,7 +83,6 @@ const addUser = async () => {
         console.log(error)
     }
 }
-
 const ViewUSer = async (user) => {
     try {
         let { data } = await axios(route('view.cliente', { id: user.id }))
@@ -94,9 +111,39 @@ const EditUser = async () => {
         console.log(error)
     }
 }
+const selectResult = (result) => {
+    searchTerm.value = result;
+    filteredResults.value = [];
+    openModalOpenInfoCliente.value = true
+}
+const selectDocument = (result) => {
+    searchBancoDeDatos.value = result.nombres;
+    filteredResultsBancoDeDatos.value = []
+    documentSelected.value = result
+}
+const filterResults = () => {
+    filteredResults.value = results.value.filter(result =>
 
+        result.name.toString().toLowerCase().includes(searchTerm.value.email.toLowerCase())
+    );
+}
+const filterResultsBancoDeDatos = () => {
+    filteredResultsBancoDeDatos.value = resultsBancoDeDatos.value.filter(result =>
+        result.nombres.toString().toLowerCase().includes(searchBancoDeDatos.value.toLowerCase())
+    );
+}
+
+const aduntarDocumentoToUser = async () => {
+    try {
+        await axios.post(route('asociar.datos.a.usuario'), {doc: documentSelected.value, user: searchTerm.value})
+        openModalOpenInfoCliente.value = false
+    } catch (error) {
+        console.log(error)
+    }
+}
 onMounted(() => {
     getUsuarios()
+    getBancoDeDatos()
 })
 </script>
 <template>
@@ -211,7 +258,8 @@ onMounted(() => {
                                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
                                         </div>
-                                        <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110">
+                                        <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110"
+                                            @click.prevent="selectResult(usuario)">
                                             <svg width="17px" height="17px" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg" fill="none">
                                                 <path fill="#000000" fill-rule="evenodd"
@@ -319,6 +367,112 @@ onMounted(() => {
             <template #footer>
                 <btnPrimary @click.prevent="EditUser">
                     Editar
+                </btnPrimary>
+            </template>
+        </modal>
+        <modal :show="openModalOpenInfoCliente" maxWidth="lg">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3 max-h-fit "
+                    @click="openModalOpenInfoCliente = false">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+            <template #content>
+                <div class="m-4">
+                    <input type="text" disabled class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Search" v-model="searchTerm.email" @input="filterResults">
+
+                    <ul v-if="filteredResults.length > 0" class="mt-2 mb-2 border border-gray-300 rounded-lg shadow-lg">
+                        <li v-for="(result, r) in filteredResults" :key="r">
+                            <div
+                                class="flex drop-shadow-md flex-row py-4 px-2 items-center border-2 m-1 rounded-lg  border-l-4 border-blue-400 hover:cursor-pointer">
+                                <div class="w-1/4">
+                                    <svg width="40px" height="40px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                                        <g id="avatar" transform="translate(-1407 -182)">
+                                            <circle id="Ellipse_16" data-name="Ellipse 16" cx="15" cy="15" r="15"
+                                                transform="translate(1408 183)" fill="#e8f7f9" stroke="#333"
+                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                                            <g id="Group_49" data-name="Group 49">
+                                                <circle id="Ellipse_17" data-name="Ellipse 17" cx="4.565" cy="4.565"
+                                                    r="4.565" transform="translate(1418.435 192.13)" fill="#fff1b6"
+                                                    stroke="#333" stroke-miterlimit="10" stroke-width="2" />
+                                                <path id="Path_53" data-name="Path 53"
+                                                    d="M1423,213a14.928,14.928,0,0,0,9.4-3.323,9.773,9.773,0,0,0-18.808,0A14.928,14.928,0,0,0,1423,213Z"
+                                                    fill="#fff1b6" stroke="#333" stroke-miterlimit="10" stroke-width="2" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div class="w-full">
+                                    <div class="text-lg font-semibold">{{ result.name }}</div>
+                                    <span class="text-gray-500">{{ result.email }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="m-4">
+                    <input type="text" class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Search"
+                        v-model="searchBancoDeDatos" @input="filterResultsBancoDeDatos">
+
+                    <ul v-if="filteredResultsBancoDeDatos.length > 0"
+                        class="mt-2 mb-2 border border-gray-300 rounded-lg shadow-lg">
+                        <li v-for="(result, r) in filteredResultsBancoDeDatos" :key="r">
+                            <div @click.prevent="selectDocument(result)"
+                                class="flex drop-shadow-md flex-row py-4 px-2 items-center border-2 m-1 rounded-lg  border-l-4 border-blue-400 hover:cursor-pointer">
+                                <div class="w-1/4">
+                                    <svg width="40px" height="40px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none">
+                                        <path fill="#000000" fill-rule="evenodd"
+                                            d="M4 1a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7.414A2 2 0 0017.414 6L13 1.586A2 2 0 0011.586 1H4zm0 2h7.586L16 7.414V17H4V3zm2 2a1 1 0 000 2h5a1 1 0 100-2H6zm-1 5a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" />
+                                    </svg>
+                                </div>
+                                <div class="w-full">
+                                    <div class="text-md text-right mb-4 font-semibold">
+                                        Documento
+                                    </div>
+                                    <div class="text-xs text-left font-semibold">
+                                        creado:{{ result.created_at ? result.created_at.substr(0, 10) : '' }} /
+                                        actualizado:{{ result.updated_at ? result.updated_at.substr(0, 10) : '' }}
+                                    </div>
+                                    <div class="text-lg font-semibold">{{ result.nombres }}</div>
+                                    <span class="text-gray-500">{{ result.correo_electronico_del_solicitante }}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div v-if="documentSelected"
+                        class="flex drop-shadow-md flex-row py-4 px-2 items-center border-2 m-1 rounded-lg  border-l-4 border-blue-400 hover:cursor-pointer">
+                        <div class="w-1/4">
+                            <svg width="40px" height="40px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                fill="none">
+                                <path fill="#000000" fill-rule="evenodd"
+                                    d="M4 1a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V7.414A2 2 0 0017.414 6L13 1.586A2 2 0 0011.586 1H4zm0 2h7.586L16 7.414V17H4V3zm2 2a1 1 0 000 2h5a1 1 0 100-2H6zm-1 5a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" />
+                            </svg>
+                        </div>
+                        <div class="w-full">
+                            <div class="text-md text-right mb-4 font-semibold">
+                                Documento
+                            </div>
+                            <div class="text-xs text-right font-semibold">
+                                creado:{{ documentSelected.created_at ? documentSelected.created_at.substr(0, 10) : '' }} /
+                                actualizado:{{ documentSelected.updated_at ? documentSelected.updated_at.substr(0, 10) : ''
+                                }}
+                            </div>
+                            <div class="text-lg font-semibold">{{ documentSelected.nombres }}</div>
+                            <span class="text-gray-500">{{ documentSelected.correo_electronico_del_solicitante }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <btnPrimary @click.prevent="aduntarDocumentoToUser">
+                    asociar Documento
                 </btnPrimary>
             </template>
         </modal>
