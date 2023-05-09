@@ -59,4 +59,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(CreditRequest::class, 'user_id');
     }
+    public function hasOneDocument()
+    {
+        return $this->hasOne(BancoDeDatos::class, 'user_id');
+    }
 }

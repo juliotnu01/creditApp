@@ -20,7 +20,7 @@ class UserController extends Controller
     {
         try {
             
-            $users = User::with('hasManyCreditsRequests')->where('id', "<>", Auth()->user()->id )->get();
+            $users = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument')->where('id', "<>", Auth()->user()->id )->get();
             return response()->json($users);
         } catch (\Throwable $th) {
             throw $th;
@@ -30,7 +30,7 @@ class UserController extends Controller
     {
         try {
             
-            $users = User::with('hasManyCreditsRequests')->where('id', "<>", Auth()->user()->id )->where('raw_rol', 'cliente')->get();
+            $users = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument')->where('id', "<>", Auth()->user()->id )->where('raw_rol', 'cliente')->get();
             return response()->json($users);
         } catch (\Throwable $th) {
             throw $th;
@@ -40,7 +40,7 @@ class UserController extends Controller
     {
         try {
             
-            $user = User::with('hasManyCreditsRequests')->where('id', $id )->first();
+            $user = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument')->where('id', $id )->first();
             return response()->json($user);
         } catch (\Throwable $th) {
             throw $th;
