@@ -18,65 +18,129 @@ const UserSelected = ref(false);
 const ProductoSelected = ref('Selecciona el producto');
 const openModalEditUser = ref(false);
 const headerTableBancoDeDatos = ref([
-    { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '', show: false }, // Nombre de supervisor OLA 
-    { header: "Ciudad ", fixed: false, value: '', class: '', show: false }, // Ciudad 
-    { header: "NOMBRE COMPLETO", fixed: false, value: '', class: '', show: false }, // NOMBRE COMPLETO	
-    { header: "Fecha de nacimiento", fixed: false, value: '', class: '', show: false }, // Fecha de nacimiento	
-    { header: "Dirección ", fixed: false, value: '', class: '', show: false }, // Dirección 	
-    { header: "INE o identificación oficial", fixed: false, value: '', class: '', show: false }, // INE o identificación oficial	
-    { header: "Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)", fixed: false, value: '', class: '', show: false }, // Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)
-    { header: "Comprobante de domicilio del cliente", fixed: false, value: '', class: '', show: false }, // Comprobante de domicilio del cliente	
-    { header: "Comprobante de domicilio alterno", fixed: false, value: '', class: '', show: false }, // Comprobante de domicilio alterno	
-    { header: "Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)	", fixed: false, value: '', class: '', show: false }, // Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)	
-    { header: "¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?", fixed: false, value: '', class: '', show: false }, //¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?
-    { header: "¿Cuál es el producto que se está solicitando?", fixed: false, value: '', class: '', show: false },// ¿Cuál es el producto que se está solicitando?
-    { header: "Por favor indica el monto de dinero solicitado", fixed: false, value: '', class: '', show: false }, // Por favor indica el monto de dinero solicitado	
-    { header: "¿Cuál es la razón de tu crédito?	", fixed: false, value: '', class: '', show: false },// ¿Cuál es la razón de tu crédito?	
-    { header: "¿En cuánto tiempo piensas pagar tu crédito?", fixed: false, value: '', class: '', show: false }, // ¿En cuánto tiempo piensas pagar tu crédito?	
-    { header: "¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?", fixed: false, value: '', class: '', show: false }, // ¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?
-    { header: "¿Para qué necesita el capital?", fixed: false, value: '', class: '', show: false }, // ¿Para qué necesita el capital?	préstamos?
-    { header: "¿Cuenta con una cuenta bancaria?", fixed: false, value: '', class: '', show: false },// ¿Cuenta con una cuenta bancaria?	
-    { header: "Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?", fixed: false, value: '', class: '', show: false },// Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?	
-    { header: "¿Cuál es el número de cuenta Clabe?", fixed: false, value: '', class: '', show: false },// ¿Cuál es el número de cuenta CLABE?	
-    { header: "¿Cuál es el número de su cuenta/tarjeta?", fixed: false, value: '', class: '', show: false },// ¿Cuál es el número de su cuenta/tarjeta?	
-    { header: "¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.", fixed: false, value: '', class: '', show: false },// Si no tiene su número de cuenta o cuenta CLABE, por favor sube la imagen la tarjeta de banco.	
-    { header: "Nombre y teléfono de una referencia familiar", fixed: false, value: '', class: '', show: false }, // Nombre y teléfono de una referencia familiar	
-    { header: "Nombre y teléfono de una referencia personal", fixed: false, value: '', class: '', show: false }, // Nombre y teléfono de una referencia personal	
-    { header: "Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)	", fixed: false, value: '', class: '', show: false },// Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)	
-    { header: "Nombre y teléfono de una referencia  en su empresa", fixed: false, value: '', class: '', show: false },// Nombre y teléfono de una referencia  en su empresa
-    { header: "¿Tú eres trabajador independiente?", fixed: false, value: '', class: '', show: false }, // ¿Tú eres trabajador independiente?	
-    { header: "Nombre y apellido del obligado solidario ", fixed: false, value: '', class: '', show: false }, // Nombre y apellido del obligado solidario  
-    { header: "Teléfono del obligado solidario ", fixed: false, value: '', class: '', show: false }, // Teléfono del obligado solidario  	 
-    { header: "INE o identificación oficial del obligado solidario  ", fixed: false, value: '', class: '', show: false }, // INE o identificación oficial del obligado solidario para Trabajador independiente 
-    { header: "Escala de Referencia Gerente de Cliente OLA", fixed: false, value: '', class: '', show: false }, // Escala de Referencia Gerente de Cliente OLA
-    { header: "Correo electrónico del solicitante", fixed: false, value: '', class: '', show: false }, // Correo electrónico del solicitante	
-    { header: "Número de contacto (Whatsapp del solicitante)", fixed: false, value: '', class: '', show: false },// Número de contacto (Whatsapp del solicitante)
-    { header: "Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? ", fixed: false, value: '', class: '', show: false },// Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? 	
-    { header: "Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)", fixed: false, value: '', class: '', show: false },// Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)	
-    { header: "Desde cuando lo conoce? Porque lo Refiere?", fixed: false, value: '', class: '', show: false },// Desde cuando lo conoce? Porque lo Refiere? 
-    { header: "Nombre y Apellido del Aval o subrogado solidario en caso de fallecimiento", fixed: false, value: '', class: '', show: false },// Nombre y Apellido del Aval o subrogado solidario en caso de fallecimiento
-    { header: "Carátula del estado de cuenta", fixed: false, value: '', class: '', show: false },// Carátula del estado de cuenta
+    { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '', show: false },
+    { header: "Ciudad ", fixed: false, value: '', class: '', show: false },
+    { header: "NOMBRE COMPLETO", fixed: false, value: '', class: '', show: false },
+    { header: "Fecha de nacimiento", fixed: false, value: '', class: '', show: false },
+    { header: "Dirección ", fixed: false, value: '', class: '', show: false },
+    { header: "INE o identificación oficial", fixed: false, value: '', class: '', show: false },
+    { header: "Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)", fixed: false, value: '', class: '', show: false },
+    { header: "Comprobante de domicilio del cliente", fixed: false, value: '', class: '', show: false },
+    { header: "Comprobante de domicilio alterno", fixed: false, value: '', class: '', show: false },
+    { header: "Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)	", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuál es el producto que se está solicitando?", fixed: false, value: '', class: '', show: false },
+    { header: "Por favor indica el monto de dinero solicitado", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuál es la razón de tu crédito?	", fixed: false, value: '', class: '', show: false },
+    { header: "¿En cuánto tiempo piensas pagar tu crédito?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Para qué necesita el capital?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuenta con una cuenta bancaria?", fixed: false, value: '', class: '', show: false },
+    { header: "Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuál es el número de cuenta Clabe?", fixed: false, value: '', class: '', show: false },
+    { header: "¿Cuál es el número de su cuenta/tarjeta?", fixed: false, value: '', class: '', show: false },
+    { header: "¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.", fixed: false, value: '', class: '', show: false },
+    { header: "Nombre y teléfono de una referencia familiar", fixed: false, value: '', class: '', show: false },
+    { header: "Nombre y teléfono de una referencia personal", fixed: false, value: '', class: '', show: false },
+    { header: "Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)	", fixed: false, value: '', class: '', show: false },
+    { header: "Nombre y teléfono de una referencia  en su empresa", fixed: false, value: '', class: '', show: false },
+    { header: "¿Tú eres trabajador independiente?", fixed: false, value: '', class: '', show: false },
+    { header: "Nombre y apellido del obligado solidario ", fixed: false, value: '', class: '', show: false },
+    { header: "Teléfono del obligado solidario ", fixed: false, value: '', class: '', show: false },
+    { header: "INE o identificación oficial del obligado solidario  ", fixed: false, value: '', class: '', show: false },
+    { header: "Escala de Referencia Gerente de Cliente OLA", fixed: false, value: '', class: '', show: false },
+    { header: "Correo electrónico del solicitante", fixed: false, value: '', class: '', show: false },
+    { header: "Número de contacto (Whatsapp del solicitante)", fixed: false, value: '', class: '', show: false },
+    { header: "Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? ", fixed: false, value: '', class: '', show: false },
+    { header: "Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)", fixed: false, value: '', class: '', show: false },
+    { header: "Desde cuando lo conoce? Porque lo Refiere?", fixed: false, value: '', class: '', show: false },
+    { header: "Nombre y Apellido del Aval o subrogado solidario en caso de fallecimiento", fixed: false, value: '', class: '', show: false },
+    { header: "Carátula del estado de cuenta", fixed: false, value: '', class: '', show: false },
     { header: "Accion", fixed: false, value: '', class: '', show: false }
 ]);
 const modelComentario = ref({
     comentario: '',
     user_id: null
 })
+
+const modelDocument = ref({
+    ine_identificacion: null,
+    comprobante_domicilio_cliente: null,
+    comprobante_domicilio_alterno: null,
+    imagen_tarjeta_banco: null,
+    foto_local_comercial: null,
+    comprobante_ingresos: null,
+    comprobante_domicilio_obligado: null,
+    comprobante_ine_obligado: null,
+    garantia_1: null,
+    garantia_2: null,
+    caratula_cuenta: null,
+});
+
+const handleDocumentIne_identificacion = (e) => {
+    modelDocument.value.ine_identificacion = e.target.files[0]
+}
+const handleDocumentComprobante_domicilio_cliente = (e) => {
+    modelDocument.value.comprobante_domicilio_cliente = e.target.files[0]
+}
+const handleDocumentComprobante_domicilio_alterno = (e) => {
+    modelDocument.value.comprobante_domicilio_alterno = e.target.files[0]
+}
+const handleDocumentImagen_tarjeta_banco = (e) => {
+    modelDocument.value.imagen_tarjeta_banco = e.target.files[0]
+}
+const handleDocumentFoto_local_comercial = (e) => {
+    modelDocument.value.foto_local_comercial = e.target.files[0]
+}
+const handleDocumentComprobante_ingresos = (e) => {
+    modelDocument.value.comprobante_ingresos = e.target.files[0]
+}
+const handleComprobante_domicilio_obligado = (e) => {
+    modelDocument.value.comprobante_domicilio_obligado = e.target.files[0]
+}
+const handleComprobante_ine_obligado = (e) => {
+    modelDocument.value.comprobante_ine_obligado = e.target.files[0]
+}
+const handleGarantia_1 = (e) => {
+    modelDocument.value.garantia_1 = e.target.files[0]
+}
+const handleGarantia_2 = (e) => {
+    modelDocument.value.garantia_2 = e.target.files[0]
+}
+const handleCaratula_cuenta = (e) => {
+    modelDocument.value.caratula_cuenta = e.target.files[0]
+}
+
 const dataList = ref([
-    { titulo: '¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?	', toggle: false, show: false},
-    { titulo: '¿Cuál es el producto que se está solicitando?', toggle: false, show: false},
-    { titulo: '¿Cuál es la razón de tu crédito?', toggle: false, show: false},
-    { titulo: '¿En cuánto tiempo piensas pagar tu crédito?', toggle: false, show: false},
-    { titulo: '¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?', toggle: false, show: false},
-    { titulo: '¿Para qué necesita el capital?', toggle: false, show: false},
-    { titulo: '¿Cuenta con una cuenta bancaria?', toggle: false, show: false},
-    { titulo: 'Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?	', toggle: false, show: false},
-    { titulo: '¿Cuál es el número de cuenta CLABE?', toggle: false, show: false},
-    { titulo: '¿Cuál es el número de su cuenta/tarjeta?', toggle: false, show: false},
-    { titulo: '¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.', toggle: false, show: false},
-    { titulo: '¿Tú eres trabajador independiente?', toggle: false, show: false},
-    { titulo: 'Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)?', toggle: false, show: false},
-    { titulo: 'Desde cuando lo conoce? Porque lo Refiere? ', toggle: false, show: false},
+    { titulo: '¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?	', toggle: false, show: false },
+    { titulo: '¿Cuál es el producto que se está solicitando?', toggle: false, show: false },
+    { titulo: '¿Cuál es la razón de tu crédito?', toggle: false, show: false },
+    { titulo: '¿En cuánto tiempo piensas pagar tu crédito?', toggle: false, show: false },
+    { titulo: '¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?', toggle: false, show: false },
+    { titulo: '¿Para qué necesita el capital?', toggle: false, show: false },
+    { titulo: '¿Cuenta con una cuenta bancaria?', toggle: false, show: false },
+    { titulo: 'Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?	', toggle: false, show: false },
+    { titulo: '¿Cuál es el número de cuenta CLABE?', toggle: false, show: false },
+    { titulo: '¿Cuál es el número de su cuenta/tarjeta?', toggle: false, show: false },
+    { titulo: '¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.', toggle: false, show: false },
+    { titulo: '¿Tú eres trabajador independiente?', toggle: false, show: false },
+    { titulo: 'Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)?', toggle: false, show: false },
+    { titulo: 'Desde cuando lo conoce? Porque lo Refiere? ', toggle: false, show: false },
+
+])
+const dataListDocument = ref([
+    { titulo: 'INE o identificación oficial', toggle: false, show: false },
+    { titulo: 'Comprobante de domicilio del cliente', toggle: false, show: false },
+    { titulo: 'Comprobante de domicilio alterno', toggle: false, show: false },
+    { titulo: 'Si no tiene su número de cuenta o cuenta CLABE, por favor sube la imagen la tarjeta de banco.', toggle: false, show: false },
+    { titulo: 'Foto del Local comercial', toggle: false, show: false },
+    { titulo: 'Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)', toggle: false, show: false },
+    { titulo: 'Comprobante de domicilio Obligado', toggle: false, show: false },
+    { titulo: 'INE o identificación oficial del obligado solidario', toggle: false, show: false },
+    { titulo: 'Sube documento de garantía 1', toggle: false, show: false },
+    { titulo: 'Sube documento de garantía 2', toggle: false, show: false },
+    { titulo: 'Carátula del estado de cuenta', toggle: false, show: false },
+    
 
 ])
 const getUsuarios = async () => {
@@ -130,10 +194,30 @@ const openEditModalUserDocument = () => {
     openModalEditUser.value = true
 }
 const EditUserDocument = async () => {
-    try{
+    try {
         await axios.put(route('edit.user.document'), BancoDeDatos.value)
         openModalEditUser.value = false
-    }catch(e){
+    } catch (e) {
+        console.log(e)
+    }
+}
+const addDocumentFile = async () => {
+    try {
+        let formData = new FormData();
+        formData.append('id_document', BancoDeDatos.value.id)
+        formData.append('ine_identificacion', modelDocument.value.ine_identificacion)
+        formData.append('comprobante_domicilio_cliente', modelDocument.value.comprobante_domicilio_cliente)
+        formData.append('comprobante_domicilio_alterno', modelDocument.value.comprobante_domicilio_alterno)
+        formData.append('imagen_tarjeta_banco', modelDocument.value.imagen_tarjeta_banco)
+        formData.append('foto_local_comercial', modelDocument.value.foto_local_comercial)
+        formData.append('comprobante_ingresos', modelDocument.value.comprobante_ingresos)
+        formData.append('comprobante_domicilio_obligado', modelDocument.value.comprobante_domicilio_obligado)
+        formData.append('comprobante_ine_obligado', modelDocument.value.comprobante_ine_obligado)
+        formData.append('garantia_1', modelDocument.value.garantia_1)
+        formData.append('garantia_2', modelDocument.value.garantia_2)
+        formData.append('caratula_cuenta', modelDocument.value.caratula_cuenta)
+        await axios.post(route('add.document.file'), formData , { headers: { "Content-Type": "multipart/form-data" } } )
+    } catch (e) {
         console.log(e)
     }
 }
@@ -151,17 +235,23 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
 
     }
 
-    
+
     if (newValue == 'PRESTAMO EMERGENTE') {
         headerTableBancoDeDatos.value[30].show = true
         headerTableBancoDeDatos.value[34].show = true
         headerTableBancoDeDatos.value[36].show = true
-        
+
         // preguntas y respuestas
-        
+
         dataList.value[1].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
+        
+        // Documentos
+        
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[9].show = true
 
 
 
@@ -172,12 +262,18 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         headerTableBancoDeDatos.value[34].show = true
         headerTableBancoDeDatos.value[36].show = true
 
-        
+
         // preguntas y respuestas
-        
+
         dataList.value[1].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
+
+        // Documentos
+        
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[10].show = true
 
     }
 
@@ -192,10 +288,9 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         headerTableBancoDeDatos.value[36].show = true
 
         // preguntas y respuestas
-        
+
         dataList.value[0].show = true
         dataList.value[1].show = true
-        dataList.value[3].show = true
         dataList.value[4].show = true
         dataList.value[5].show = true
         dataList.value[6].show = true
@@ -203,8 +298,22 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         dataList.value[8].show = true
         dataList.value[9].show = true
         dataList.value[10].show = true
+        dataList.value[11].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
+
+
+           // Documentos
+        
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[2].show = true
+        dataListDocument.value[3].show = true
+        dataListDocument.value[5].show = true
+        dataListDocument.value[6].show = true
+        dataListDocument.value[7].show = true
+        dataListDocument.value[10].show = true
+
     }
     if (newValue == 'PRESTAMO PARA TRABAJADOR INDEPENDIENTE') {
         headerTableBancoDeDatos.value[6].show = true
@@ -218,6 +327,16 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
             element.show = true
 
         }
+
+          // Documentos
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[2].show = true
+        dataListDocument.value[3].show = true
+        dataListDocument.value[5].show = true
+        dataListDocument.value[6].show = true
+        dataListDocument.value[7].show = true
+        dataListDocument.value[10].show = true
     }
     if (newValue == 'PRESTAMOS MAYOR QUE 20 MIL para cliente de 2a ocasión') {
         headerTableBancoDeDatos.value[27].show = true
@@ -228,10 +347,18 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         headerTableBancoDeDatos.value[36].show = true
 
         // preguntas y respuestas
-        
+
         dataList.value[1].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
+
+        // documentos
+
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[6].show = true
+        dataListDocument.value[7].show = true
+        dataListDocument.value[10].show = true
     }
 
     if (newValue == 'PRESTAMOS MAYOR QUE 50 MIL para cliente de 2a ocasión') {
@@ -243,10 +370,20 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         headerTableBancoDeDatos.value[36].show = true
 
         // preguntas y respuestas
-        
+
         dataList.value[1].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
+
+        // documentos
+
+        dataListDocument.value[0].show = true
+        dataListDocument.value[1].show = true
+        dataListDocument.value[6].show = true
+        dataListDocument.value[7].show = true
+        dataListDocument.value[8].show = true
+        dataListDocument.value[9].show = true
+        dataListDocument.value[10].show = true
     }
 
 }, { deep: true })
@@ -296,11 +433,11 @@ onMounted(() => {
                                     d="M1,20a1,1,0,0,0,1,1h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5Zm12.707,9.707L20.414,17l2.293,2.293a1,1,0,1,1-1.414,1.414L19,18.414l-2.293,2.293a1,1,0,0,1-1.414-1.414L17.586,17l-2.293-2.293a1,1,0,0,1,1.414-1.414L19,15.586l2.293-2.293a1,1,0,0,1,1.414,1.414Z" />
                             </svg>
                         </span>
-                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-6 items-center" @click.prevent="openEditModalUserDocument" 
-                            v-if="UserSelected">
-                            <svg width="15px" height="15px" viewBox="0 0 1024 1024"  class="hover:cursor-pointer hover:text-yellow-700">
-                                <path
-                                    class="fill-current"
+                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-6 items-center"
+                            @click.prevent="openEditModalUserDocument" v-if="UserSelected">
+                            <svg width="15px" height="15px" viewBox="0 0 1024 1024"
+                                class="hover:cursor-pointer hover:text-yellow-700">
+                                <path class="fill-current"
                                     d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
                                     fill="#000000" />
                             </svg>
@@ -347,10 +484,12 @@ onMounted(() => {
                             UserSelected.created_at.substr(0, 10) }}</h1>
                         <h1 class="text-left font-bold  px-1 text-gray-700  flex justify-between hover:bg-gray-100">
                             {{ BancoDeDatos.nombre_completo }}
-                            
+
                             <svg width="15px" height="15px" viewBox="0 0 24 24" fill="none" class="ml-1 min-w-max">
-                                <g >
-                                    <path id="Vector" d="M19 21C19 17.134 15.866 14 12 14C8.13401 14 5 17.134 5 21M12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7C16 9.20914 14.2091 11 12 11Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <g>
+                                    <path id="Vector"
+                                        d="M19 21C19 17.134 15.866 14 12 14C8.13401 14 5 17.134 5 21M12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7C16 9.20914 14.2091 11 12 11Z"
+                                        stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </g>
                             </svg>
                         </h1>
@@ -667,7 +806,8 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.ine_o_identificacion_oficial ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[6].show">
-                                        <span>{{ BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_cliente ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_cliente
+                                            ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[7].show">
                                         <span>{{ BancoDeDatos.comprobante_domicilio_cliente ?? '' }}</span>
@@ -676,7 +816,8 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.comprobante_domicilio_alterno ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[9].show">
-                                        <span>{{ BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_alterno ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_alterno
+                                            ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[10].show">
                                         <span>{{ BancoDeDatos.principal_fuente_de_ingreso ?? '' }}</span>
@@ -714,7 +855,8 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.numero_de_cuenta_tarjeta ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[21].show">
-                                        <span>{{ BancoDeDatos.si_no_tiene_tarjeta_o_cable_indique_tarjeta_de_banco ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.si_no_tiene_tarjeta_o_cable_indique_tarjeta_de_banco ?? ''
+                                        }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[22].show">
                                         <span>{{ BancoDeDatos.nombre_telefono_referencia_familia ?? '' }}</span>
@@ -734,13 +876,16 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.eres_trabajador_independiente ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[27].show">
-                                        <span>{{ BancoDeDatos.nombre_apellido_del_solidario_trabajador_independiente ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.nombre_apellido_del_solidario_trabajador_independiente ?? ''
+                                        }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[28].show">
-                                        <span>{{ BancoDeDatos.telefono_del_solidario_trabajador_independiente ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.telefono_del_solidario_trabajador_independiente ?? ''
+                                        }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[29].show">
-                                        <span>{{ BancoDeDatos.ine_identificacion_del_solidario_trabajador_independiente ?? ''
+                                        <span>{{ BancoDeDatos.ine_identificacion_del_solidario_trabajador_independiente ??
+                                            ''
                                         }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[30].show">
@@ -762,7 +907,8 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.desde_cuando_lo_conoce_porque_lo_refiere ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[36].show">
-                                        <span>{{ BancoDeDatos.nombre_apellido_aval_subrogado_solidario_fallecimiento ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.nombre_apellido_aval_subrogado_solidario_fallecimiento ?? ''
+                                        }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[37].show">
                                         <span>{{ BancoDeDatos.caratula_del_estado_de_cuenta ?? '' }}</span>
@@ -804,26 +950,20 @@ onMounted(() => {
                     </div>
                 </div>
                 <div class=" flex gap-2 mt-2">
-                    <form class=" bg-white mb-2 h-fit max-w-[350px] py-6 px-9">
-                        <div class="mb-6 pt-4">
+                    <div class=" bg-white mb-2 h-fit max-w-[350px] py-6 px-9">
+                        <!-- <div class="mb-6 pt-4">
                             <label class="mb-5 block text-xl font-semibold text-[#07074D]">
-                                Upload File
+                                Archivos
                             </label>
 
                             <div class="mb-8">
                                 <input type="file" name="file" id="file" class="sr-only" />
                                 <label for="file"
-                                    class="relative flex min-h-[200px] items-center justify-center rounded-md border border-dashed border-[#e0e0e0] p-12 text-center">
+                                    class="relative flex  items-center justify-center rounded-md border border-dashed border-[#e0e0e0] p-12 text-center">
                                     <div>
-                                        <span class="mb-2 block text-xl font-semibold text-[#07074D]">
-                                            Drop files here
-                                        </span>
-                                        <span class="mb-2 block text-base font-medium text-[#6B7280]">
-                                            Or
-                                        </span>
                                         <span
                                             class="inline-flex rounded border border-[#e0e0e0] py-2 px-7 text-base font-medium text-[#07074D]">
-                                            Browse
+                                            Buscar archivo
                                         </span>
                                     </div>
                                 </label>
@@ -883,75 +1023,133 @@ onMounted(() => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
+                        <listExpacionPanel :data="dataListDocument" title="Documentos">
+                            <template #slot-0>
+                                    <input type="file"
+                                        @change="handleDocumentIne_identificacion"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-1>
+                                    <input type="file"
+                                        @change="handleDocumentComprobante_domicilio_cliente"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-2>
+                                    <input type="file"
+                                        @change="handleDocumentComprobante_domicilio_alterno"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-3>
+                                    <input type="file"
+                                        @change="handleDocumentImagen_tarjeta_banco"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-4>
+                                    <input type="file"
+                                        @change="handleDocumentFoto_local_comercial"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-5>
+                                    <input type="file"
+                                        @change="handleDocumentComprobante_ingresos"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-6>
+                                    <input type="file"
+                                        @change="handleComprobante_domicilio_obligado"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-7>
+                                    <input type="file"
+                                        @change="handleComprobante_ine_obligado"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-8>
+                                    <input type="file"
+                                        @change="handleGarantia_1"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-9>
+                                    <input type="file"
+                                        @change="handleGarantia_2"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                            <template #slot-10>
+                                    <input type="file"
+                                        @change="handleCaratula_cuenta"
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                                </template>
+                        </listExpacionPanel>
 
                         <div>
                             <button
+                            @click.prevent="addDocumentFile"
                                 class="hover:shadow-form w-full rounded-md bg-[#6A64F1] py-3 px-8 text-center text-base font-semibold text-white outline-none">
-                                Send File
+                                Guardar Archivos
                             </button>
                         </div>
-                    </form>
+                    </div>
                     <div class=" flex flex-col ">
                         <div class="bg-white border h-full  w-full">
                             <listExpacionPanel :data="dataList" title="Preguntas y respuestas">
                                 <template #slot-0>
-                                    <input v-model="BancoDeDatos.principal_fuente_de_ingreso" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.principal_fuente_de_ingreso" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-1>
                                     <input v-model="BancoDeDatos.producto_solicitado" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-2>
                                     <input v-model="BancoDeDatos.razon_credito" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-3>
-                                    <input v-model="BancoDeDatos.en_que_tiempo_piensa_pagar" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.en_que_tiempo_piensa_pagar" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-4>
-                                    <input v-model="BancoDeDatos.bajo_que_esquema_esta_acostumbrado_a_pagar" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.bajo_que_esquema_esta_acostumbrado_a_pagar" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-5>
-                                    <input v-model="BancoDeDatos.para_que_necesita_el_dinero" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.para_que_necesita_el_dinero" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-6>
-                                    <input v-model="BancoDeDatos.cuenta_con_una_cuenta_bancaria" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.cuenta_con_una_cuenta_bancaria" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-7>
                                     <input v-model="BancoDeDatos.banco_cuenta_bancaria" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-8>
-                                    <input v-model="BancoDeDatos.numero_de_cuenta_clabe" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.numero_de_cuenta_clabe" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-9>
-                                    <input v-model="BancoDeDatos.numero_de_cuenta_tarjeta" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.numero_de_cuenta_tarjeta" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-11>
-                                    <input v-model="BancoDeDatos.eres_trabajador_independiente" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.eres_trabajador_independiente" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-12>
-                                    <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-13>
-                                    <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
                                 <template #slot-14>
-                                    <input v-model="BancoDeDatos.desde_cuando_lo_conoce_porque_lo_refiere" type="text" @blur="EditUserDocument"
-                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full" >
+                                    <input v-model="BancoDeDatos.desde_cuando_lo_conoce_porque_lo_refiere" type="text"
+                                        @blur="EditUserDocument" class="border border-gray-300 py-2 px-4 rounded-lg w-full">
                                 </template>
-                                
+
                             </listExpacionPanel>
                         </div>
                         <div class="w-full mr-4  bg-white mt-2 border border-gray-200">
@@ -1104,47 +1302,63 @@ onMounted(() => {
                     <input v-model="BancoDeDatos.nombre_completo" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre completo">
                     <input v-model="BancoDeDatos.ine_o_identificacion_oficial" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="INE o identificacion oficial">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="INE o identificacion oficial">
                     <input v-model="BancoDeDatos.correo_electronico_del_solicitante" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Correo">
                     <input v-model="BancoDeDatos.numero_de_contacto_ws" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Numero de contacto (whatsapp)">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Numero de contacto (whatsapp)">
                     <input v-model="BancoDeDatos.direccion" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Direccion">
                     <input v-model="BancoDeDatos.principal_fuente_de_ingreso" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Principal fuente de ingreso">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Principal fuente de ingreso">
                     <input v-model="BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_cliente" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)">
                     <input v-model="BancoDeDatos.tipo_de_relacion_persona_titular_comprobante_domicilio_alterno" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)">
                     <input v-model="BancoDeDatos.para_que_necesita_el_dinero" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="¿Para que necesita el dinero?">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="¿Para que necesita el dinero?">
                     <input v-model="BancoDeDatos.cuenta_con_una_cuenta_bancaria" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="¿Cuenta con una cuenta bancaria?">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="¿Cuenta con una cuenta bancaria?">
                     <input v-model="BancoDeDatos.banco_cuenta_bancaria" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="En que banco tiene la cuenta bancaria">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="En que banco tiene la cuenta bancaria">
                     <input v-model="BancoDeDatos.numero_de_cuenta_clabe" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="CLABE">
                     <input v-model="BancoDeDatos.numero_de_cuenta_tarjeta" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Numero de tarjeta">
                     <input v-model="BancoDeDatos.nombre_telefono_referencia_familia" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Telefono referencia familiar">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Telefono referencia familiar">
                     <input v-model="BancoDeDatos.nombre_telefono_referencia_personal" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre o Telefono referencia personal">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Nombre o Telefono referencia personal">
                     <input v-model="BancoDeDatos.nombre_telefono_referencia_empresa" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre o telefono referencia empresa">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Nombre o telefono referencia empresa">
                     <input v-model="BancoDeDatos.nombre_apellido_del_solidario_trabajador_independiente" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre y apellido del solidario">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Nombre y apellido del solidario">
                     <input v-model="BancoDeDatos.telefono_del_solidario_trabajador_independiente" type="text"
                         class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Telefono del solidario">
                     <input v-model="BancoDeDatos.ine_identificacion_del_solidario_trabajador_independiente" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="INE o identificacaion del solidario">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="INE o identificacaion del solidario">
                     <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Relacion con la persona que lo refiere">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Relacion con la persona que lo refiere">
                     <input v-model="BancoDeDatos.desde_cuando_lo_conoce_porque_lo_refiere" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Desde cuando conoce la persona que lo refiere">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Desde cuando conoce la persona que lo refiere">
                     <input v-model="BancoDeDatos.nombre_apellido_aval_subrogado_solidario_fallecimiento" type="text"
-                        class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre y apellido aval subrogado solidario en caso de fallecimiento">
+                        class="border border-gray-300 py-2 px-4 rounded-lg w-full"
+                        placeholder="Nombre y apellido aval subrogado solidario en caso de fallecimiento">
                 </div>
             </template>
             <template #footer>

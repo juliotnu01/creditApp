@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::put('/edit-banco-de-datos',[BancoDeDatosController::class, 'edit'])->name('edit.user.document');
     Route::post('/asociardar-datos-a-usuario',[BancoDeDatosController::class, 'asociarDocumento'])->name('asociar.datos.a.usuario');
     Route::post('/add-comentario',[ComentarioController::class, 'store'])->name('add.comentario');
+    Route::post('/add-document-file',[BancoDeDatosController::class, 'addDocumentFile'])->name('add.document.file');
 // });
 
 

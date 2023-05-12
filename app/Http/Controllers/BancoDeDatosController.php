@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\BancoDeDatos;
+use App\Models\{BancoDeDatos, DocumentosDeBancoDeDatos};
 use DB;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class BancoDeDatosController extends Controller
 {
@@ -70,7 +72,7 @@ class BancoDeDatosController extends Controller
     public function asociarDocumento(Request $request)
     {
         try {
-            $banDeDato = New BancoDeDatos();
+            $banDeDato = new BancoDeDatos();
             $banDeDato->find($request['doc']['id'])->update([
                 "user_id" => $request['user']['id']
             ]);
@@ -82,9 +84,218 @@ class BancoDeDatosController extends Controller
     public function edit(Request $request)
     {
         try {
-            $banDeDato = New BancoDeDatos();
+            $banDeDato = new BancoDeDatos();
             $banDeDato->find($request['id'])->update($request->all());
             return response()->json(['mensaje' => 'Documento Editado con exito']);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function addDocumentFile(Request $request)
+    {
+        try {
+            return DB::transaction(function () use ($request) {
+
+                if ($request->ine_identificacion != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante ine o identificacion/", $request->file('ine_identificacion'), $request->file('ine_identificacion')->getClientOriginalName());
+                    $urlFile_ine_identificacion = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante ine o identificacion/" . $request->file('ine_identificacion')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_ine_identificacion;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'comprobante ine o identificador',
+                    ]);
+                } else {
+                    $urlFile_ine_identificacion = null;
+                }
+
+                if ($request->comprobante_domicilio_cliente != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante domicilio cliente/", $request->file('comprobante_domicilio_cliente'), $request->file('comprobante_domicilio_cliente')->getClientOriginalName());
+                    $urlFile_comprobante_domicilio_cliente = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante domicilio cliente/" . $request->file('comprobante_domicilio_cliente')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_comprobante_domicilio_cliente;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'comprobante domicilio cliente',
+                    ]);
+                } else {
+                    $urlFile_comprobante_domicilio_cliente = null;
+                }
+
+                if ($request->comprobante_domicilio_alterno != "null") {
+
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante domicilio alterno/", $request->file('comprobante_domicilio_alterno'), $request->file('comprobante_domicilio_alterno')->getClientOriginalName());
+                    $urlFile_comprobante_domicilio_alterno = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante domicilio alterno/" . $request->file('comprobante_domicilio_alterno')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_comprobante_domicilio_alterno;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'comprobante domicilio alterno',
+                    ]);
+                } else {
+                    $urlFile_comprobante_domicilio_alterno = null;
+                }
+
+                if ($request->imagen_tarjeta_banco != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/imagen tarjeta banco/", $request->file('imagen_tarjeta_banco'), $request->file('imagen_tarjeta_banco')->getClientOriginalName());
+                    $urlFile_imagen_tarjeta_banco = asset(Storage::disk('public')->url("/archivos/$fecha/imagen tarjeta banco/" . $request->file('imagen_tarjeta_banco')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_imagen_tarjeta_banco;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'Imagen Tarjeta Banco',
+                    ]);
+                } else {
+                    $urlFile_imagen_tarjeta_banco = null;
+                }
+
+                if ($request->foto_local_comercial != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/foto local comercial/", $request->file('foto_local_comercial'), $request->file('foto_local_comercial')->getClientOriginalName());
+                    $urlFile_foto_local_comercial = asset(Storage::disk('public')->url("/archivos/$fecha/foto local comercial/" . $request->file('foto_local_comercial')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_foto_local_comercial;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'Foto local comercial',
+                    ]);
+                } else {
+                    $urlFile_foto_local_comercial = null;
+                }
+
+                if ($request->comprobante_ingresos != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante ingreso/", $request->file('comprobante_ingresos'), $request->file('comprobante_ingresos')->getClientOriginalName());
+                    $urlFile_comprobante_ingresos = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante ingreso/" . $request->file('comprobante_ingresos')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_comprobante_ingresos;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'Comprobante Ingreso',
+                    ]);
+                } else {
+                    $urlFile_comprobante_ingresos = null;
+                }
+
+                if ($request->comprobante_domicilio_obligado != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante domicilio obligado/", $request->file('comprobante_domicilio_obligado'), $request->file('comprobante_domicilio_obligado')->getClientOriginalName());
+                    $urlFile_comprobante_domicilio_obligado = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante domicilio obligado/" . $request->file('comprobante_domicilio_obligado')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_comprobante_domicilio_obligado;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'comprobante domicilio obligado',
+                    ]);
+                } else {
+                    $urlFile_comprobante_domicilio_obligado = null;
+                }
+
+                if ($request->comprobante_ine_obligado != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/comprobante ine obligado/", $request->file('comprobante_ine_obligado'), $request->file('comprobante_ine_obligado')->getClientOriginalName());
+                    $urlFile_comprobante_ine_obligado = asset(Storage::disk('public')->url("/archivos/$fecha/comprobante ine obligado/" . $request->file('comprobante_ine_obligado')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_comprobante_ine_obligado;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'comprobante ine obligado',
+                    ]);
+                } else {
+                    $urlFile_comprobante_ine_obligado = null;
+                }
+
+                if ($request->garantia_1 != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/garantia 1/", $request->file('garantia_1'), $request->file('garantia_1')->getClientOriginalName());
+                    $urlFilegarantia_1 = asset(Storage::disk('public')->url("/archivos/$fecha/garantia 1/" . $request->file('garantia_1')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFilegarantia_1;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'gararantia 1',
+                    ]);
+                } else {
+                    $urlFile_garantia_1 = null;
+                }
+
+                if ($request->garantia_2 != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/garantia 2/", $request->file('garantia_2'), $request->file('garantia_2')->getClientOriginalName());
+                    $urlFile_garantia_2 = asset(Storage::disk('public')->url("/archivos/$fecha/garantia 2/" . $request->file('garantia_2')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_garantia_2;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'gararantia 2',
+                    ]);
+                } else {
+                    $urlFile_garantia_2 = null;
+                }
+
+
+                if ($request->caratula_cuenta != "null") {
+                    $fecha = substr(Carbon::now(), 0, 10);
+                    Storage::disk('public')->putFileAs("/archivos/$fecha/caratula cuenta/", $request->file('caratula_cuenta'), $request->file('caratula_cuenta')->getClientOriginalName());
+                    $urlFile_caratula_cuenta = asset(Storage::disk('public')->url("/archivos/$fecha/caratula cuenta/" . $request->file('caratula_cuenta')->getClientOriginalName()));
+
+                    $documentoFile = new DocumentosDeBancoDeDatos();
+                    $documentoFile->documento = $urlFile_caratula_cuenta;
+                    $documentoFile->banco_de_datos_id = $request->id_document;
+                    $documentoFile->save();
+
+                    $documentoFile->hasOneStatusDocument()->create([
+                        'status' => false,
+                        'nombre_documento' => 'caratula cuenta',
+                    ]);
+                } else {
+                    $urlFile_caratula_cuenta = null;
+                }
+            });
         } catch (\Throwable $th) {
             throw $th;
         }
