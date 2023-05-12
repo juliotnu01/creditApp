@@ -66,8 +66,14 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
         return Inertia::render('BancoDeDatos/index');
     })->name('banco.de.datos');
 
-    Route::get('/crear-creditos', function () {
-        return Inertia::render('CrearCreditos/index');
-    })->name('crear.creditos');
+    Route::prefix('crear-creditos')->name('crear.creditos.')->group(function () {
+
+        Route::get('/', function () {
+            return Inertia::render('CrearCreditos/index');
+        })->name('index');
     
+        Route::get('/analizis', function () {
+            return Inertia::render('CrearCreditos/AnalizisCredito');
+        })->name('analizis');
+    });
 });

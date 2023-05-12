@@ -6,7 +6,7 @@ use App\Http\Controllers\{  CreditRequestController,
                             AaMortizacioncontroller,
                             UserController,
                             MensajeController,
-                            BancoDeDatosController};
+                            BancoDeDatosController, ComentarioController};
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/add-upload-file-json',[BancoDeDatosController::class, 'saveUploadJson'])->name('add.upload.file.json');
     Route::get('/get-banco-de-datos',[BancoDeDatosController::class, 'index'])->name('get.banco.de.datos');
     Route::post('/asociardar-datos-a-usuario',[BancoDeDatosController::class, 'asociarDocumento'])->name('asociar.datos.a.usuario');
+    Route::post('/add-comentario',[ComentarioController::class, 'store'])->name('add.comentario');
 // });
 
 

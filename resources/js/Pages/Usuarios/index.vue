@@ -129,7 +129,7 @@ const filterResults = () => {
 }
 const filterResultsBancoDeDatos = () => {
     filteredResultsBancoDeDatos.value = resultsBancoDeDatos.value.filter(result =>
-        result.nombres.toString().toLowerCase().includes(searchBancoDeDatos.value.toLowerCase())
+        result.correo_electronico_del_solicitante.toString().toLowerCase().includes(searchBancoDeDatos.value.toLowerCase())
     );
 }
 

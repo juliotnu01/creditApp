@@ -20,6 +20,6 @@
     "dependencies": {
         "moment": "^2.29.4",
         "pinia": "^2.0.34",
-        "xlsx": "^0.18.5"
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
     }
 }

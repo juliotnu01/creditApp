@@ -23,45 +23,45 @@ const openModalAgergarManulDatos = ref(false);
 const jsonData = ref(false);
 const BancoDeDatos = ref(false);
 const headerTableBancoDeDatos = ref([
-    { header: "Marca temporal", fixed: false, value: '', class: '' },
-    { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '' },
-    { header: "Ciudad ", fixed: false, value: '', class: '' },
-    { header: "Colaborador OLA o cliente OLA que lo referencía", fixed: false, value: '', class: '' },
-    { header: "Nombre (s)", fixed: false, value: '', class: '' },
-    { header: "Apellido Paterno", fixed: false, value: '', class: '' },
-    { header: "Apellido Materno", fixed: false, value: '', class: '' },
-    { header: "NOMBRE COMPLETO", fixed: false, value: '', class: '' },
-    { header: "Fecha de nacimiento", fixed: false, value: '', class: '' },
-    { header: "Dirección ", fixed: false, value: '', class: '' },
-    { header: "INE o identificación oficial", fixed: false, value: '', class: '' },
-    { header: "Comprobante de domicilio del cliente", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es el producto que se está solicitando?", fixed: false, value: '', class: '' },
-    { header: "Por favor indica el monto de dinero solicitado", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es la razón por la que tiene esa deuda?", fixed: false, value: '', class: '' },
-    { header: "¿Hace cuánto tiempo debe ese dinero?", fixed: false, value: '', class: '' },
-    { header: "¿A qué institución le debe ese dinero?", fixed: false, value: '', class: '' },
-    { header: "¿Cuenta con una cuenta bancaria?", fixed: false, value: '', class: '' },
-    { header: "Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?", fixed: false, value: '', class: '' },
-    { header: "¿Porqué no ha podido pagar su deuda?", fixed: false, value: '', class: '' },
-    { header: "Por favor sube todos los documentos referentes al crédito o deuda que tiene", fixed: false, value: '', class: '' },
-    { header: "¿Para qué necesita el capital?", fixed: false, value: '', class: '' },
-    { header: "¿Sus proveedores pueden emitir facturas?", fixed: false, value: '', class: '' },
+    { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '' }, // Nombre de supervisor OLA 
+    { header: "Ciudad ", fixed: false, value: '', class: '' }, // Ciudad 
+    { header: "NOMBRE COMPLETO", fixed: false, value: '', class: '' }, // NOMBRE COMPLETO	
+    { header: "Fecha de nacimiento", fixed: false, value: '', class: '' }, // Fecha de nacimiento	
+    { header: "Dirección ", fixed: false, value: '', class: '' }, // Dirección 	
+    { header: "INE o identificación oficial", fixed: false, value: '', class: '' }, // INE o identificación oficial	
+    { header: "Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)", fixed: false, value: '', class: '' }, // Tipo de relación con con la persona titular del comprobante de domicilio (del cliente)
+    { header: "Comprobante de domicilio del cliente", fixed: false, value: '', class: '' }, // Comprobante de domicilio del cliente	
+    { header: "Comprobante de domicilio alterno", fixed: false, value: '', class: '' }, // Comprobante de domicilio alterno	
+    { header: "Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)	", fixed: false, value: '', class: '' }, // Tipo de relación con la persona titular del comprobante de domicilio (del domicilio alterno)	
+    { header: "¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?", fixed: false, value: '', class: '' }, //¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?
+    { header: "¿Cuál es el producto que se está solicitando?", fixed: false, value: '', class: '' },// ¿Cuál es el producto que se está solicitando?
+    { header: "Por favor indica el monto de dinero solicitado", fixed: false, value: '', class: '' }, // Por favor indica el monto de dinero solicitado	
+    { header: "¿Cuál es la razón de tu crédito?	", fixed: false, value: '', class: '' },// ¿Cuál es la razón de tu crédito?	
+    { header: "¿En cuánto tiempo piensas pagar tu crédito?", fixed: false, value: '', class: '' }, // ¿En cuánto tiempo piensas pagar tu crédito?	
+    { header: "¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?", fixed: false, value: '', class: '' }, // ¿Bajo qué esquema está acostumbrado(a) pagar sus préstamos?
+    { header: "¿Para qué necesita el capital?", fixed: false, value: '', class: '' }, // ¿Para qué necesita el capital?	préstamos?
+    { header: "¿Tú eres trabajador independiente?", fixed: false, value: '', class: '' }, // ¿Tú eres trabajador independiente?	
+    { header: "Nombre y apellido del obligado solidario para Trabajador independiente", fixed: false, value: '', class: '' }, // Nombre y apellido del obligado solidario para Trabajador independiente 
+    { header: "Teléfono del obligado solidario para Trabajador independiente", fixed: false, value: '', class: '' }, // Teléfono del obligado solidario para Trabajador independiente 	 
+    { header: "Escala de Referencia Gerente de Cliente OLA", fixed: false, value: '', class: '' }, // Escala de Referencia Gerente de Cliente OLA
+    { header: "Correo electrónico del solicitante", fixed: false, value: '', class: '' }, // Correo electrónico del solicitante	
+    { header: "¿Cuenta con una cuenta bancaria?", fixed: false, value: '', class: '' },// ¿Cuenta con una cuenta bancaria?	
+    { header: "Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?", fixed: false, value: '', class: '' },// Si tu respuesta fue que SI, ¿en qué banco tiene cuenta?	
     { header: "El local de su negocio, ¿es rentado o propiedad del solicitante?", fixed: false, value: '', class: '' },
-    { header: "Por favor sube fotos del local ", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es el número de su cuenta/tarjeta?", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es el número de cuenta Clabe?", fixed: false, value: '', class: '' },
-    { header: "¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.", fixed: false, value: '', class: '' },
-    { header: "¿Cuál es su número de cuenta/tarjeta?", fixed: false, value: '', class: '' },
-    { header: "Escala de Referencia Gerente de Cliente OLA", fixed: false, value: '', class: '' },
-    { header: "Correo electrónico del solicitante", fixed: false, value: '', class: '' },
-    { header: "Número de contacto (Whatsapp del solicitante)", fixed: false, value: '', class: '' },
-    { header: "Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? ", fixed: false, value: '', class: '' },
-    { header: "Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)", fixed: false, value: '', class: '' },
-    { header: "Desde cuando lo conoce? Porque lo Refiere? ", fixed: false, value: '', class: '' },
-    { header: "Aprobación OPERATIVA (El cliente debe de cumplir con los requisitos operativos que pedimos y se debe de hacer una revisión sobre la documentación y su orden)", fixed: false, value: '', class: '' },
-    { header: "Aprobación LEGAL (Revisión exhaustiva sobre los datos, direcciones, nombres y aspectos legales), fixed:false, value: '', class:''" },
-    { header: "Accion", fixed:false, value: '', class:'' }
+    { header: "Por favor sube fotos del local ", fixed: false, value: '', class: '' }, // ¿Cuál es el número de su cuenta/tarjeta?	
+    { header: "¿Cuál es el número de su cuenta/tarjeta?", fixed: false, value: '', class: '' },// ¿Cuál es el número de su cuenta/tarjeta?	
+    { header: "¿Cuál es el número de cuenta Clabe?", fixed: false, value: '', class: '' },// ¿Cuál es el número de cuenta CLABE?	
+    { header: "¿no tiene cuenta o cuenta CLABE, carga imagen la tarjeta de banco.", fixed: false, value: '', class: '' },// Si no tiene su número de cuenta o cuenta CLABE, por favor sube la imagen la tarjeta de banco.	
+    { header: "Nombre y teléfono de una referencia familiar", fixed: false, value: '', class: '' }, // Nombre y teléfono de una referencia familiar	
+    { header: "Nombre y teléfono de una referencia personal", fixed: false, value: '', class: '' }, // Nombre y teléfono de una referencia personal	
+    { header: "Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)	", fixed: false, value: '', class: '' },// Comprobante de ingresos, certificado laboral o contrato de trabajo (para maestros será aceptado talón de cheque con plaza)	
+    { header: "Nombre y teléfono de una referencia  en su empresa", fixed: false, value: '', class: '' },// Nombre y teléfono de una referencia  en su empresa
+    { header: "Número de contacto (Whatsapp del solicitante)", fixed: false, value: '', class: '' },// Número de contacto (Whatsapp del solicitante)
+    { header: "Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? ", fixed: false, value: '', class: '' },// Quien lo refiere? Que tipo de  relación tiene (amistad, familia, vecino, etc)? 	
+    { header: "Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)", fixed: false, value: '', class: '' },// Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)	
+    { header: "Desde cuando lo conoce? Porque lo Refiere?", fixed: false, value: '', class: '' },// Desde cuando lo conoce? Porque lo Refiere? 
+    { header: "Nombre y Apellido del Aval o subrogado solidario en caso de fallecimiento", fixed: false, value: '', class: '' },// Nombre y Apellido del Aval o subrogado solidario en caso de fallecimiento
+    { header: "Accion", fixed: false, value: '', class: '' }
 ]);
 const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -70,7 +70,13 @@ const handleFileUpload = (e) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        jsonData.value = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+        jsonData.value = XLSX.utils.sheet_to_json(worksheet, {
+            defval: '', // Tratar las celdas vacías como cadenas vacías
+            blankrows: false, // Omitir filas vacías
+            raw: false, // Convertir valores de celda a sus tipos nativos (números, fechas, etc.)
+            skipHidden: false, // Omitir columnas ocultas
+            dateNF: 'yyyy-mm-dd', // Formato de fecha personalizado si corresponde
+        });
     }
     reader.readAsArrayBuffer(file);
 }
@@ -86,11 +92,13 @@ const saveUploadFile = async () => {
 const geBancoDeDatos = async () => {
     try {
         let { data } = await axios(route('get.banco.de.datos'))
-        BancoDeDatos.value = data
+        BancoDeDatos.value = dataz
     } catch (error) {
         console.log(error)
     }
 }
+
+
 
 onMounted(() => {
     geBancoDeDatos()
@@ -151,165 +159,171 @@ onMounted(() => {
         <div class="bg-white max-w-7xl mx-auto shadow-md rounded my-6 overflow-x-scroll">
             <table class=" w-full table-auto">
                 <thead>
-                     <tr class="bg-gray-200 text-gray-600 capitalize leading-normal relative">
+                    <tr class="bg-gray-200 text-gray-600 capitalize leading-normal relative">
                         <th class="py-3 w-12 px-3 text-center bg-gray-200 text-gray-600 text-xs"
-                            :class="{ ' sticky left-0 h-full bg-gray-100 w-32 ': h.fixed }" v-for="(h, n) in headerTableBancoDeDatos"
-                            :key="n">
+                            :class="{ ' sticky left-0 h-full bg-gray-100 w-32 ': h.fixed }"
+                            v-for="(h, n) in headerTableBancoDeDatos" :key="n">
                             {{ h.header }}
                         </th>
-                     </tr>
+                    </tr>
                 </thead>
                 <tbody class="text-gray-600 text-sm font-light">
                     <tr class="border-b border-gray-200 hover:bg-gray-100" v-for="(data, d) in BancoDeDatos" :key="d">
-                            
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.marca_temporal }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.nombre_de_supervisort_ola }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.ciudad }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.colaborador_ola_o_cliente_ola_que_lo_referencia }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.nombres }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.apellido_paterno }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.apellido_materno }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.nombre_completo }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.fecha_de_nacimiento }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.direccion }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.ine_o_identificacion_oficial }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.comprobacion_domicilio_del_cliente }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_el_principal_fuente_de_ingreso_o_como_piensa_pagar }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_el_producto_que_se_solicitando }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.monto_dinero_solicitado }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_la_razon_por_la_que_tiene_esa_deuda }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.hace_cuanto_tiene_ese_dinero }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.a_que_instucion_le_debe_dinero }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cuenta_con_una_cuenta_bancaria }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.si_respuesta_fue_si_en_banco_tiene_cuenta }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.porque_no_ha_podido_pagar_su_deuda }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.para_que_necesita_el_capital }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.sus_proveedores_pueden_emitir_factura }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.el_local_de_su_negocio_es_restado_o_propiedad_del_solicitante }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.foto_del_local }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.foto_del_local }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_el_numero_de_su_cuenta_tarjeta }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_el_numero_de_su_cuenta_clabe }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.cual_es_el_numero_de_su_cuenta_clabe }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.si_no_tiene_cuenta_imagen_de_la_cuenta_del_banco }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.escala_de_referencia_gerente_de_cliente_ola }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.correo_electronico_del_solicitante }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.numero_de_contacto_ws_solicitante }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.quien_lo_refiere_que_tipo_de_relacion_tiene }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.tiene_redes_sociales }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.desde_cuando_lo_conoce_porquer_refiere }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.aprobacion_operativa }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <span>{{ data.aprobacion_legal }}</span>
-                            </td>
-                            <td class="py-3 px-6 text-center">
-                                <div class="flex item-center justify-center">
-                                    <div class="w-4 mr-2 transform  hover:scale-110">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </div>
-                                    <div class="w-4 mr-2 transform  hover:scale-110">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </div>
-                                    <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110">
-                                        <svg fill="#000000" height="15px" width="15px" viewBox="0 0 329.328 329.328"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
+
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_supervisor_ola }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.ciudad }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_completo }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.fecha_de_nacimiento }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.direccion }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.ine_o_identificacion_oficial }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.tipo_de_relacion_persona_titular_comprobante_domicilio_cliente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.comprobante_domicilio_cliente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.comprobante_domicilio_alterno }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.tipo_de_relacion_persona_titular_comprobante_domicilio_alterno }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.principal_fuente_de_ingreso }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.producto_solicitado }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.dinero_solicitado }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.razon_credito }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.en_que_tiempo_piensa_pagar }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.bajo_que_esquema_esta_acostumbrado_a_pagar }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.para_que_necesita_el_dinero }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.cuenta_con_una_cuenta_bancaria }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.banco_cuenta_bancaria }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.numero_de_cuenta_clabe }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.numero_de_cuenta_tarjeta }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.si_no_tiene_tarjeta_o_cable_indique_tarjeta_de_banco }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_telefono_referencia_familia }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_telefono_referencia_personal }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.comprobante_ingresos_certificado_laboral }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_telefono_referencia_empresa }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.eres_trabajador_independiente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_apellido_del_solidario_trabajador_independiente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.telefono_del_solidario_trabajador_independiente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.ine_identificacion_del_solidario_trabajador_independiente }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.escala_referencia_gerente_ola }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.correo_electronico_del_solicitante }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.numero_de_contacto_ws }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.quien_lo_refiere_que_tipo_de_relacion_tiene }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.tiene_redes_sociales }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.desde_cuando_lo_conoce_porque_lo_refiere }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.nombre_apellido_aval_subrogado_solidario_fallecimiento }}</span>
+                        </td>
+                        <td class="py-3 px-6 text-center">
+                            <span>{{ data.caratula_del_estado_de_cuenta }}</span>
+                        </td>
+                        
+
+
+
+
+
+                        <td class="py-3 px-6 text-center">
+                            <div class="flex item-center justify-center">
+                                <div class="w-4 mr-2 transform  hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </div>
+                                <div class="w-4 mr-2 transform  hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </div>
+                                <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110">
+                                    <svg fill="#000000" height="15px" width="15px" viewBox="0 0 329.328 329.328"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
                                                                                     c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
                                                                                     L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
                                                                                     c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
                                                                                     C299.324,238.921,238.917,299.328,164.666,299.328z" />
-                                        </svg>
-                                    </div>
+                                    </svg>
                                 </div>
-                            </td>
-                        </tr>
-                
-                    </tbody>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
             </table>
         </div>
         <modal :show="openModalSubirDocumento" maxWidth="lg">

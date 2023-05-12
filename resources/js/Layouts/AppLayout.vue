@@ -14,10 +14,10 @@ import sidebar from '../Components/sidebar.vue'
 const storecomponent = useComponentStore();
 
 const isOpen = computed({
-    get(){
+    get() {
         return storecomponent.sideBar
     },
-    set(val){
+    set(val) {
         storecomponent.sideBar = val
     }
 })
@@ -35,7 +35,6 @@ const switchToTeam = (team) => {
         preserveState: false,
     });
 };
-
 const logout = () => {
     router.post(route('logout'));
 };
@@ -83,7 +82,8 @@ const logout = () => {
                                 </NavLink>
                             </div>
                             <div v-if="!isCliente" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('crear.creditos')" :active="route().current('crear.creditos')">
+                                <NavLink :href="route('crear.creditos.index')"
+                                    :active="route().current('crear.creditos.index')">
                                     Crear Creditos
                                 </NavLink>
                             </div>
@@ -324,8 +324,97 @@ const logout = () => {
                 </div>
             </header>
             <div class="flex h-auto">
-                <sidebar/> 
+                <sidebar />
                 <!-- Content -->
+                <aside v-show="route().current('crear.creditos.*')" class="border-r px-6">
+                    <div>
+                        <ul class="space-y-2 tracking-wide mt-8">
+                            <li>
+                                <!-- <a href="#" aria-label="dashboard"
+                                    class="relative px-4 py-3 flex items-center space-x-4 rounded-xl text-white bg-gradient-to-r from-sky-600 to-cyan-400">
+                                    
+                                    <span class="-mr-1 font-medium">Dashboard</span>
+                                </a> -->
+                                <NavLink :href="route('crear.creditos.index')"
+                                    :active="route().current('crear.creditos.index')"
+                                    class=" w-full px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group"
+                                    :class="{ 'rounded-xl text-white bg-gradient-to-r from-sky-600 to-cyan-400': route().current('crear.creditos.index') }">
+                                    <svg class="-ml-1 h-6 w-6" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M6 8a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8ZM6 15a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1Z"
+                                            class="fill-current text-cyan-400 dark:fill-slate-600"></path>
+                                        <path d="M13 8a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V8Z"
+                                            class="fill-current text-cyan-200 group-hover:text-cyan-300"></path>
+                                        <path d="M13 15a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-1Z"
+                                            class="fill-current group-hover:text-sky-300"></path>
+                                    </svg>
+                                    <span class="group-hover:text-gray-700">Dashboard</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink :href="route('crear.creditos.analizis')"
+                                    :active="route().current('crear.creditos.analizis')"
+                                    class=" w-full px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group"
+                                    :class="{ 'rounded-xl text-white bg-gradient-to-r from-sky-600 to-cyan-400': route().current('crear.creditos.analizis') }">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path class="fill-current text-gray-300 group-hover:text-cyan-300"
+                                            fill-rule="evenodd"
+                                            d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z"
+                                            clip-rule="evenodd" />
+                                        <path class="fill-current text-gray-600 group-hover:text-cyan-600"
+                                            d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
+                                    </svg>
+                                    <span class="group-hover:text-gray-700">Analizis</span>
+                                </NavLink>
+                                <!-- <a href="#"
+                                    class="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
+                                    
+                                </a> -->
+                            </li>
+                            <li>
+                                <a href="#" class="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path class="fill-current text-gray-600 group-hover:text-cyan-600"
+                                            fill-rule="evenodd"
+                                            d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z"
+                                            clip-rule="evenodd" />
+                                        <path class="fill-current text-gray-300 group-hover:text-cyan-300"
+                                            d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z" />
+                                    </svg>
+                                    <span class="group-hover:text-gray-700">Reports</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path class="fill-current text-gray-600 group-hover:text-cyan-600"
+                                            d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                                        <path class="fill-current text-gray-300 group-hover:text-cyan-300"
+                                            d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                                    </svg>
+                                    <span class="group-hover:text-gray-700">Other data</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path class="fill-current text-gray-300 group-hover:text-cyan-300"
+                                            d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                                        <path class="fill-current text-gray-600 group-hover:text-cyan-600"
+                                            fill-rule="evenodd"
+                                            d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="group-hover:text-gray-700">Finance</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
                 <div class="flex-1 relative text-xs p-8 bg-gray-100">
                     <main>
                         <!-- <div class="fixed bottom-4 right-4">

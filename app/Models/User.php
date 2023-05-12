@@ -63,4 +63,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(BancoDeDatos::class, 'user_id');
     }
+    public function hasManyComentarios()
+    {
+        return $this->hasMany(Comentario::class, 'user_id');
+    }
 }
