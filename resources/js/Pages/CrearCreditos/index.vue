@@ -73,7 +73,7 @@ const dataList = ref([
     { titulo: '¿Tú eres trabajador independiente?	', toggle: false },
     { titulo: 'Tiene redes sociales? Como lo encontramos en las Redes Sociales? (LinkedIn, Facebook, instagram, etc.)	', toggle: false },
     { titulo: 'Desde cuando lo conoce? Porque lo Refiere? ', toggle: false },
-    
+
 ])
 const getUsuarios = async () => {
     try {
@@ -201,6 +201,14 @@ onMounted(() => {
                                     d="M1,20a1,1,0,0,0,1,1h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5Zm12.707,9.707L20.414,17l2.293,2.293a1,1,0,1,1-1.414,1.414L19,18.414l-2.293,2.293a1,1,0,0,1-1.414-1.414L17.586,17l-2.293-2.293a1,1,0,0,1,1.414-1.414L19,15.586l2.293-2.293a1,1,0,0,1,1.414,1.414Z" />
                             </svg>
                         </span>
+                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-1 items-center" @click.prevent="clearUsuario"
+                            v-if="UserSelected">
+                            <svg width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
+                                    fill="#000000" />
+                            </svg>
+                        </span>
                         <ul v-if="filteredResults.length > 0"
                             class="mt-2 z-10 bg-white absolute mb-2 border border-gray-300 rounded-lg shadow-lg">
                             <li v-for="(result, r) in filteredResults" :key="r">
@@ -254,7 +262,8 @@ onMounted(() => {
                         </h1>
                         <p class="text-gray-500 mt-1 px-1 text-left flex justify-between hover:bg-gray-100">
                             {{ BancoDeDatos.correo_electronico_del_solicitante }}
-                            <svg height="15px" width="15px" version="1.1" viewBox="0 0 512 512" xml:space="preserve" class="ml-1 min-w-max">
+                            <svg height="15px" width="15px" version="1.1" viewBox="0 0 512 512" xml:space="preserve"
+                                class="ml-1 min-w-max">
                                 <g>
                                     <path class="st0" d="M510.746,110.361c-2.128-10.754-6.926-20.918-13.926-29.463c-1.422-1.794-2.909-3.39-4.535-5.009
 		c-12.454-12.52-29.778-19.701-47.531-19.701H67.244c-17.951,0-34.834,7-47.539,19.708c-1.608,1.604-3.099,3.216-4.575,5.067
@@ -295,7 +304,8 @@ onMounted(() => {
                         <p class="text-gray-500 mt-1 px-1 text-left flex justify-between hover:bg-gray-100"
                             v-if="BancoDeDatos">
                             {{ BancoDeDatos.principal_fuente_de_ingreso }}
-                            <svg width="15px" height="15px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="ml-1 min-w-max">
+                            <svg width="15px" height="15px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                class="ml-1 min-w-max">
                                 <path fill-rule="evenodd"
                                     d="M5.508 2.466L4.356 5H2.5A1.5 1.5 0 001 6.5v1.882l.503.251a19 19 0 0016.994 0L19 8.382V6.5A1.5 1.5 0 0017.5 5h-1.856l-1.152-2.534A2.5 2.5 0 0012.216 1H7.784a2.5 2.5 0 00-2.276 1.466zM7.784 3a.5.5 0 00-.455.293L6.553 5h6.894l-.776-1.707A.5.5 0 0012.216 3H7.784z"
                                     fill="#5C5F62" />
@@ -910,7 +920,7 @@ onMounted(() => {
                                     </table>
                                 </div>
                             </div>
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
