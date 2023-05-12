@@ -19,8 +19,15 @@ class UserController extends Controller
     public function index()
     {
         try {
-            
-            $users = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument', 'hasManyComentarios', 'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id )->get();
+
+            $users = User::with(
+                'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.belongToUser', 
+                'hasOneDocument', 
+                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
+                'hasManyComentarios', 
+                'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id)->get();
             return response()->json($users);
         } catch (\Throwable $th) {
             throw $th;
@@ -29,8 +36,15 @@ class UserController extends Controller
     public function indexClientes()
     {
         try {
-            
-            $users = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument', 'hasManyComentarios', 'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id )->where('raw_rol', 'cliente')->get();
+
+            $users = User::with(
+                'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.belongToUser', 
+                'hasOneDocument', 
+                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
+                'hasManyComentarios',
+                'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id)->where('raw_rol', 'cliente')->get();
             return response()->json($users);
         } catch (\Throwable $th) {
             throw $th;
@@ -39,8 +53,15 @@ class UserController extends Controller
     public function viewCliente($id)
     {
         try {
-            
-            $user = User::with('hasManyCreditsRequests','hasManyCreditsRequests.belongToUser', 'hasOneDocument', 'hasManyComentarios', 'hasManyComentarios.WhoDidComment')->where('id', $id )->first();
+
+            $user = User::with(
+                'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.belongToUser', 
+                'hasOneDocument', 
+                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
+                'hasManyComentarios',
+                'hasManyComentarios.WhoDidComment')->where('id', $id)->first();
             return response()->json($user);
         } catch (\Throwable $th) {
             throw $th;
@@ -98,13 +119,13 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         return DB::transaction(function () use ($request, $id) {
             return User::find($id)->update([
                 'name' => $request['name'],
                 'email' => $request['email'],
-                'password' => Hash::make($request['password']) ,
-                'raw_rol' => $request['raw_rol'] 
+                'password' => Hash::make($request['password']),
+                'raw_rol' => $request['raw_rol']
             ]);
         });
     }

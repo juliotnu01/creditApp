@@ -11,8 +11,8 @@ class BancoDeDatos extends Model
 
     protected $guarded = [];
     
-    public function hasManyDocument()
+    public function hasManyFileDocument()
     {
-        return $this->hasMany(DocumentosDeBancoDeDatos::class, 'bando_de_datos_id');
+        return $this->hasMany(DocumentosDeBancoDeDatos::class, 'banco_de_datos_id');
     }
 }

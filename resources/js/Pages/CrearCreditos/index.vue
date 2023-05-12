@@ -251,7 +251,7 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         
         dataListDocument.value[0].show = true
         dataListDocument.value[1].show = true
-        dataListDocument.value[9].show = true
+        dataListDocument.value[10].show = true
 
 
 
