@@ -79,4 +79,14 @@ class BancoDeDatosController extends Controller
             throw $th;
         }
     }
+    public function edit(Request $request)
+    {
+        try {
+            $banDeDato = New BancoDeDatos();
+            $banDeDato->find($request['id'])->update($request->all());
+            return response()->json(['mensaje' => 'Documento Editado con exito']);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

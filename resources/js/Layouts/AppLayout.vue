@@ -47,7 +47,7 @@ const logout = () => {
 
         <Banner />
 
-        <div class="min-h-auto">
+        <div class=" min-h-auto ">
             <nav class="bg-white border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -415,7 +415,7 @@ const logout = () => {
                         </ul>
                     </div>
                 </aside>
-                <div class="flex-1 relative text-xs p-8 bg-gray-100">
+                <div class="flex-1 relative text-xs p-8 bg-gray-50 min-h-screen ">
                     <main>
                         <!-- <div class="fixed bottom-4 right-4">
                             <button @click.prevent="isOpen = true"

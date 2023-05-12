@@ -1,10 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { router } from '@inertiajs/vue3';
 import { ref, onMounted, watch } from 'vue';
-// import PrimaryButton from '../../Components/PrimaryButton.vue'
+import btnPrimary from '../../Components/PrimaryButton.vue'
 import listExpacionPanel from "../../Components/listWithExpancionPanel.vue";
-import moment from 'moment'
+import modal from "../../Components/DialogModal.vue";
 
 
 const props = defineProps({
@@ -17,6 +16,7 @@ const searchTerm = ref('');
 const BancoDeDatos = ref(false);
 const UserSelected = ref(false);
 const ProductoSelected = ref('Selecciona el producto');
+const openModalEditUser = ref(false);
 const headerTableBancoDeDatos = ref([
     { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '' }, // Nombre de supervisor OLA 
     { header: "Ciudad ", fixed: false, value: '', class: '' }, // Ciudad 
@@ -122,6 +122,18 @@ const addcomentario = async () => {
     }
 }
 
+const openEditModalUserDocument = () => {
+    openModalEditUser.value = true
+}
+const EditUserDocument = async () => {
+    try{
+        await axios.put(route('edit.user.document'), BancoDeDatos.value)
+        openModalEditUser.value = false
+    }catch(e){
+        console.log(e)
+    }
+}
+
 watch(() => ProductoSelected.value, (newValue, oldValue) => {
 
     for (let index = 0; index < headerTableBancoDeDatos.value.length; index++) {
@@ -201,10 +213,11 @@ onMounted(() => {
                                     d="M1,20a1,1,0,0,0,1,1h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5Zm12.707,9.707L20.414,17l2.293,2.293a1,1,0,1,1-1.414,1.414L19,18.414l-2.293,2.293a1,1,0,0,1-1.414-1.414L17.586,17l-2.293-2.293a1,1,0,0,1,1.414-1.414L19,15.586l2.293-2.293a1,1,0,0,1,1.414,1.414Z" />
                             </svg>
                         </span>
-                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-1 items-center" @click.prevent="clearUsuario"
+                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-6 items-center" @click.prevent="openEditModalUserDocument" 
                             v-if="UserSelected">
-                            <svg width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                            <svg width="15px" height="15px" viewBox="0 0 1024 1024"  class="hover:cursor-pointer hover:text-yellow-700">
                                 <path
+                                    class="fill-current"
                                     d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
                                     fill="#000000" />
                             </svg>
@@ -569,7 +582,7 @@ onMounted(() => {
                                         <span>{{ BancoDeDatos.nombre_completo ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[8].show">
-                                        <span>{{ moment(BancoDeDatos.fecha_de_nacimiento).format('l') ?? '' }}</span>
+                                        <span>{{ BancoDeDatos.fecha_de_nacimiento ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[9].show">
                                         <span>{{ BancoDeDatos.direccion ?? '' }}</span>
@@ -700,7 +713,7 @@ onMounted(() => {
                     </div>
                 </div>
                 <div class=" flex gap-2 mt-2">
-                    <form class=" bg-white mb-2 max-w-[350px] py-6 px-9">
+                    <form class=" bg-white mb-2 h-fit max-w-[350px] py-6 px-9">
                         <div class="mb-6 pt-4">
                             <label class="mb-5 block text-xl font-semibold text-[#07074D]">
                                 Upload File
@@ -921,8 +934,73 @@ onMounted(() => {
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</AppLayout></template>
+        <modal :show="openModalEditUser" maxWidth="">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3 max-h-fit " @click="openModalEditUser = false">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+
+            <template #content>
+                <form>
+                    <div class="flex flex-col gap-4 mt-8 justify-center rounded-lg bg-white  dark:bg-neutral-700 w-full">
+                        <input v-model="BancoDeDatos.nombre_completo" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre completo">
+                        <input v-model="BancoDeDatos.ine_o_identificacion_oficial" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="INE o identificacion oficial">
+                        <input v-model="BancoDeDatos.correo_electronico_del_solicitante" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Correo">
+                        <input v-model="BancoDeDatos.numero_de_contacto_ws" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Numero de contacto (whatsapp)">
+                        <input v-model="BancoDeDatos.direccion" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Direccion">
+                        <input v-model="BancoDeDatos.principal_fuente_de_ingreso" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Principal fuente de ingreso">
+                        <input v-model="BancoDeDatos.para_que_necesita_el_dinero" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="¿Para que necesita el dinero?">
+                        <input v-model="BancoDeDatos.cuenta_con_una_cuenta_bancaria" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="¿Cuenta con una cuenta bancaria?">
+                        <input v-model="BancoDeDatos.banco_cuenta_bancaria" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="En que banco tiene la cuenta bancaria">
+                        <input v-model="BancoDeDatos.numero_de_cuenta_clabe" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="CLABE">
+                        <input v-model="BancoDeDatos.numero_de_cuenta_tarjeta" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Numero de tarjeta">
+                        <input v-model="BancoDeDatos.nombre_telefono_referencia_familia" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Telefono referencia familiar">
+                        <input v-model="BancoDeDatos.nombre_telefono_referencia_personal" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Telefono referencia personal">
+                        <input v-model="BancoDeDatos.nombre_telefono_referencia_empresa" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre y telefono referencia empresa">
+                        <input v-model="BancoDeDatos.nombre_apellido_del_solidario_trabajador_independiente" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre y apellido del solidario (trabajador independiente)">
+                        <input v-model="BancoDeDatos.telefono_del_solidario_trabajador_independiente" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Telefono del solidario (trabajador independiente)">
+                        <input v-model="BancoDeDatos.ine_identificacion_del_solidario_trabajador_independiente" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="INE o identificacaion del solidario (trabajador independiente)">
+                        <input v-model="BancoDeDatos.quien_lo_refiere_que_tipo_de_relacion_tiene" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Relacion con la persona que lo refiere">
+                        <input v-model="BancoDeDatos.desde_cuando_lo_conoce_porque_lo_refiere" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Desde cuando conoce la persona que lo refiere">
+                        <input v-model="BancoDeDatos.nombre_apellido_aval_subrogado_solidario_fallecimiento" type="text"
+                            class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Nombre y apellido aval subrogado solidario en caso de fallecimiento">
+                    </div>
+                </form>
+            </template>
+            <template #footer>
+                <btnPrimary @click.prevent="EditUserDocument">
+                    Editar
+                </btnPrimary>
+            </template>
+        </modal>
+    </AppLayout>
+</template>
