@@ -85,7 +85,7 @@ class BancoDeDatosController extends Controller
     {
         try {
             $banDeDato = new BancoDeDatos();
-            $banDeDato->find($request['id'])->update($request->all());
+            $banDeDato->find($request['id'])->update($request->except(['has_many_file_document']));
             return response()->json(['mensaje' => 'Documento Editado con exito']);
         } catch (\Throwable $th) {
             throw $th;

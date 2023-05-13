@@ -1,14 +1,34 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import btnPrimary from '../../Components/PrimaryButton.vue'
 import listExpacionPanel from "../../Components/listWithExpancionPanel.vue";
 import modal from "../../Components/DialogModal.vue";
-
-
+import moment from "moment";
+import { useCreditRequest } from '../../stores/creditRequest'
 const props = defineProps({
     isCliente: Boolean,
 });
+const openModal = ref(false);
+const storeCreditRequest = useCreditRequest();
+const fechaParaAgregar = ref(31);
+const amortizaciones = computed({
+    get() {
+        return storeCreditRequest.amortizaciones
+    },
+    set(val) {
+        storeCreditRequest.setAmortizaciones(val)
+    }
+})
+const valueRange = computed({
+    get() {
+        return storeCreditRequest.valueRange
+    },
+    set(val) {
+        storeCreditRequest.setValueRange(val)
+    }
+})
+const Fecha = ref(null);
 const usuarios = ref([]);
 const results = ref([]);
 const filteredResults = ref([]);
@@ -17,6 +37,7 @@ const BancoDeDatos = ref(false);
 const UserSelected = ref(false);
 const ProductoSelected = ref('Selecciona el producto');
 const openModalEditUser = ref(false);
+const openModalSolicitarCredito = ref(false);
 const headerTableBancoDeDatos = ref([
     { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '', show: false },
     { header: "Ciudad ", fixed: false, value: '', class: '', show: false },
@@ -110,7 +131,67 @@ const handleGarantia_2 = (e) => {
 const handleCaratula_cuenta = (e) => {
     modelDocument.value.caratula_cuenta = e.target.files[0]
 }
-
+const formatCurrency = (value) => {
+    const formatter = new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+    });
+    return formatter.format(value);
+}
+const ModelTablaCalculo = computed({
+    get() {
+        return storeCreditRequest.ModelTablaCalculo
+    },
+    set(val) {
+        storeCreditRequest.setModelTablaCalculo(val)
+    }
+})
+const CalculateMeses = computed({
+    get() {
+        ModelTablaCalculo.value.Meses = parseFloat(parseFloat((ModelTablaCalculo.value.periodos / ModelTablaCalculo.value.pagosMensuales)).toFixed(1))
+        return parseFloat(parseFloat((ModelTablaCalculo.value.periodos / ModelTablaCalculo.value.pagosMensuales)).toFixed(1))
+    },
+    set(values) {
+        ModelTablaCalculo.value.Meses = values
+    }
+})
+const CalculatePagoTotal = computed({
+    get() {
+        ModelTablaCalculo.value.pagoTotal = parseFloat(parseFloat((ModelTablaCalculo.value.InteresMensual * ModelTablaCalculo.value.Meses)).toFixed(2))
+        return parseFloat(parseFloat(ModelTablaCalculo.value.InteresMensual * ModelTablaCalculo.value.Meses).toFixed(2))
+    },
+    set(values) {
+        ModelTablaCalculo.value.pagoTotal = values
+    }
+})
+const CalculatePagoOla = computed({
+    get() {
+        ModelTablaCalculo.value.PagoOla = parseFloat(parseFloat(valueRange.value * (1 + CalculatePagoTotal.value / 100)).toFixed(2))
+        return parseFloat(parseFloat(valueRange.value * (1 + CalculatePagoTotal.value / 100)).toFixed(2))
+    },
+    set(values) {
+        ModelTablaCalculo.value.pagoTotal = values
+    }
+})
+const CalculateCuota = computed({
+    get() {
+        ModelTablaCalculo.value.cuota = parseFloat(parseFloat(CalculatePagoOla.value / ModelTablaCalculo.value.periodos).toFixed(2))
+        return parseFloat(parseFloat(CalculatePagoOla.value / ModelTablaCalculo.value.periodos).toFixed(2))
+    },
+    set(values) {
+        ModelTablaCalculo.value.pagoTotal = values
+    }
+})
+const tablaPrestamo = ref([
+    { cabecera: 'Monto Prestamo' },
+    { cabecera: 'Tipo de pago' },
+    { cabecera: 'Pagos mensuales' },
+    { cabecera: 'Números de periodos' },
+    { cabecera: 'Meses' },
+    { cabecera: 'Interés mensual' },
+    { cabecera: 'Pago Total' },
+    { cabecera: 'Pago OLA' },
+]);
 const dataList = ref([
     { titulo: '¿Cuál es su principal fuente de ingreso? o ¿Cómo piensa pagar lo que está solicitando?	', toggle: false, show: false },
     { titulo: '¿Cuál es el producto que se está solicitando?', toggle: false, show: false },
@@ -140,7 +221,7 @@ const dataListDocument = ref([
     { titulo: 'Sube documento de garantía 1', toggle: false, show: false },
     { titulo: 'Sube documento de garantía 2', toggle: false, show: false },
     { titulo: 'Carátula del estado de cuenta', toggle: false, show: false },
-    
+
 
 ])
 const getUsuarios = async () => {
@@ -166,19 +247,10 @@ const filterResults = () => {
 const consutarUsuario = async () => {
     BancoDeDatos.value = UserSelected.value.has_one_document
 }
-const formatCurrency = (value) => {
-    const formatter = new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-    });
-    return formatter.format(value);
-}
-
 const clearUsuario = () => {
     UserSelected.value = false
     searchTerm.value = ''
 }
-
 const addcomentario = async () => {
     try {
         modelComentario.value.user_id = UserSelected.value.id
@@ -189,9 +261,11 @@ const addcomentario = async () => {
         console.log(error)
     }
 }
-
 const openEditModalUserDocument = () => {
     openModalEditUser.value = true
+}
+const openSolicitarCredito = () => {
+    openModalSolicitarCredito.value = true
 }
 const EditUserDocument = async () => {
     try {
@@ -216,12 +290,62 @@ const addDocumentFile = async () => {
         formData.append('garantia_1', modelDocument.value.garantia_1)
         formData.append('garantia_2', modelDocument.value.garantia_2)
         formData.append('caratula_cuenta', modelDocument.value.caratula_cuenta)
-        await axios.post(route('add.document.file'), formData , { headers: { "Content-Type": "multipart/form-data" } } )
+        await axios.post(route('add.document.file'), formData, { headers: { "Content-Type": "multipart/form-data" } })
     } catch (e) {
         console.log(e)
     }
 }
+const calcularTabla = (capitalInicial, interes, pago, tabla, diasFecha) => {
+    // Si el capital es menor o igual que cero, detenemos la recursión
+    if (capitalInicial <= 0) {
+        return tabla;
+    }
 
+    // Calculamos el nuevo capital
+    const nuevoCapital = parseFloat(parseFloat(capitalInicial + interes - pago).toFixed(2));
+
+    // Agregamos los datos al array de objetos
+    tabla.push({
+        periodo: tabla.length + 1,
+        capital: capitalInicial,
+        interes: interes,
+        pago: pago,
+        dias_pago: Fecha.value.add(diasFecha, 'days').format('Do [de] MMMM [del] YYYY').replace(/\b(\d{1,2})(th|st|nd|rd)\b/g, '$1')
+    });
+    // Llamamos recursivamente la función con el nuevo capital
+    return calcularTabla(nuevoCapital, interes, pago, tabla, diasFecha);
+}
+const openSimuladorDeCredito = async () => {
+    Fecha.value = moment();
+    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
+    amortizaciones.value.splice(0, amortizaciones.value.length);
+    for (let index = 0; index < result.length; index++) {
+        const element = result[index];
+        storeCreditRequest.setAmortizaciones(element)
+    }
+    openModal.value = true
+}
+watch(() => ModelTablaCalculo, (newValue, oldValue) => {
+    switch (newValue.value.tipoPago) {
+        case "mensual":
+            newValue.value.pagosMensuales = 1
+            fechaParaAgregar.value = 31;
+            break
+        case "quincenal":
+            newValue.value.pagosMensuales = 2
+            fechaParaAgregar.value = 15;
+            break
+        case "semanal":
+            newValue.value.pagosMensuales = 4
+            fechaParaAgregar.value = 7;
+            break
+        default:
+            newValue.value.pagosMensuales = 1
+            fechaParaAgregar.value = 31;
+            break
+    }
+
+}, { deep: true })
 watch(() => ProductoSelected.value, (newValue, oldValue) => {
 
     for (let index = 0; index < headerTableBancoDeDatos.value.length; index++) {
@@ -246,9 +370,9 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         dataList.value[1].show = true
         dataList.value[12].show = true
         dataList.value[13].show = true
-        
+
         // Documentos
-        
+
         dataListDocument.value[0].show = true
         dataListDocument.value[1].show = true
         dataListDocument.value[10].show = true
@@ -270,7 +394,7 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         dataList.value[13].show = true
 
         // Documentos
-        
+
         dataListDocument.value[0].show = true
         dataListDocument.value[1].show = true
         dataListDocument.value[10].show = true
@@ -303,8 +427,8 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         dataList.value[13].show = true
 
 
-           // Documentos
-        
+        // Documentos
+
         dataListDocument.value[0].show = true
         dataListDocument.value[1].show = true
         dataListDocument.value[2].show = true
@@ -328,7 +452,7 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
 
         }
 
-          // Documentos
+        // Documentos
         dataListDocument.value[0].show = true
         dataListDocument.value[1].show = true
         dataListDocument.value[2].show = true
@@ -387,9 +511,32 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
     }
 
 }, { deep: true })
-onMounted(() => {
+const enviarCreditRequest = async () => {
+    try {
+
+        Fecha.value = moment();
+        var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
+        amortizaciones.value.splice(0, amortizaciones.value.length);
+        for (let index = 0; index < result.length; index++) {
+            const element = result[index];
+            storeCreditRequest.setAmortizaciones(element)
+        }
+        let { data } = await axios.post(route('store.credit.request'), {
+            amortizaciones: amortizaciones.value,
+            BancoDeDatos: BancoDeDatos.value,
+            UserSelected: UserSelected.value,
+            ProductoSelected: ProductoSelected.value
+        });
+        openModalSolicitarCredito.value = false
+    } catch (error) {
+        console.log(error)
+    }
+}
+onMounted(async () => {
     getUsuarios()
+
 })
+
 </script>
 <template>
     <AppLayout title="Crear Creditos" :isCliente="isCliente">
@@ -559,6 +706,25 @@ onMounted(() => {
                         </p>
                     </div>
 
+                    <button v-if="UserSelected" @click.prevent="openSolicitarCredito"
+                        class="mx-auto flex gap-4 bg-indigo-800 hover:bg-indigo-700 focus:shadow-outline focus:outline-none text-white text-xs py-1 px-10 rounded my-4">
+                        Solicitar credito
+                        <svg width="15px" height="15px" viewBox="-3 0 32 32">
+                            <g id="icomoon-ignore">
+                            </g>
+                            <path
+                                d="M13.11 29.113c7.243 0 13.113-5.871 13.113-13.113s-5.87-13.113-13.113-13.113c-7.242 0-13.113 5.871-13.113 13.113s5.871 13.113 13.113 13.113zM13.11 3.936c6.652 0 12.064 5.412 12.064 12.064s-5.412 12.064-12.064 12.064c-6.653 0-12.064-5.412-12.064-12.064s5.411-12.064 12.064-12.064z"
+                                fill="#ffffff">
+
+                            </path>
+                            <path
+                                d="M13.906 21.637l0.742 0.742 6.378-6.379-6.378-6.379-0.742 0.742 5.112 5.112h-12.727v1.049h12.727z"
+                                fill="#ffffff">
+
+                            </path>
+                        </svg>
+                    </button>
+
                     <div class=" w-full my-2 flex justify-center " v-if="UserSelected">
                         <select v-model="ProductoSelected"
                             class="bg-gray-50 border text-[9px] w-[225px] border-gray-300 text-gray-900 h-fit rounded-lg   pr-6 ">
@@ -574,6 +740,7 @@ onMounted(() => {
                                 para cliente de 2a ocasión</option>
                         </select>
                     </div>
+
 
 
                     <div class="flex relative" v-if="UserSelected">
@@ -617,7 +784,7 @@ onMounted(() => {
 
                     </div>
                 </div>
-                <div v-if="UserSelected"
+                <!-- <div v-if="UserSelected"
                     class="max-w-[240] w-[240px] mt-2 py-8 px-6 text-gray-600 rounded-xl border border-gray-200 bg-white">
                     <svg class="w-40 m-auto" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -732,7 +899,7 @@ onMounted(() => {
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> -->
             </div>
 
             <div class="w-full flex flex-col mr-4 col-span-9 h-fit" v-show="BancoDeDatos && UserSelected">
@@ -740,7 +907,6 @@ onMounted(() => {
                     <div class="rounded-xl w-full border p-5 shadow-md  bg-white">
                         <div class="flex w-full items-center justify-between border-b pb-3">
                             <div class="flex items-center space-x-3">
-
                                 <div class="text-lg font-bold text-slate-700">{{ BancoDeDatos.nombre_supervisor_ola }}
                                 </div>
                             </div>
@@ -767,6 +933,7 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="p-3 bg-white">
                     <header class="px-5 py-4 border-b border-gray-100">
@@ -936,10 +1103,10 @@ onMounted(() => {
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
-                                                                            c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
-                                                                            L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
-                                                                            c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
-                                                                            C299.324,238.921,238.917,299.328,164.666,299.328z" />
+                                                                                c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
+                                                                                L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
+                                                                                c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
+                                                                                C299.324,238.921,238.917,299.328,164.666,299.328z" />
                                                 </svg>
                                             </div>
                                         </div>
@@ -950,141 +1117,67 @@ onMounted(() => {
                     </div>
                 </div>
                 <div class=" flex gap-2 mt-2">
-                    <div class=" bg-white mb-2 h-fit max-w-[350px] py-6 px-9">
-                        <!-- <div class="mb-6 pt-4">
-                            <label class="mb-5 block text-xl font-semibold text-[#07074D]">
-                                Archivos
-                            </label>
+                    <div class=" bg-white mb-2 h-fit max-w-xs py-6 px-9">
 
-                            <div class="mb-8">
-                                <input type="file" name="file" id="file" class="sr-only" />
-                                <label for="file"
-                                    class="relative flex  items-center justify-center rounded-md border border-dashed border-[#e0e0e0] p-12 text-center">
-                                    <div>
-                                        <span
-                                            class="inline-flex rounded border border-[#e0e0e0] py-2 px-7 text-base font-medium text-[#07074D]">
-                                            Buscar archivo
-                                        </span>
-                                    </div>
-                                </label>
-                            </div>
-
-                            <div class="mb-5 rounded-md bg-[#F5F7FB] py-4 px-8">
-                                <div class="flex items-center justify-between">
-                                    <span class="truncate pr-3 text-base font-medium text-[#07074D]">
-                                        banner-design.png
-                                    </span>
-                                    <button class="text-[#07074D]">
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 0.279338C0.651787 -0.0931121 1.25565 -0.0931121 1.6281 0.279338L9.72066 8.3719C10.0931 8.74435 10.0931 9.34821 9.72066 9.72066C9.34821 10.0931 8.74435 10.0931 8.3719 9.72066L0.279337 1.6281C-0.0931125 1.25565 -0.0931125 0.651788 0.279337 0.279338Z"
-                                                fill="currentColor" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 9.72066C-0.0931125 9.34821 -0.0931125 8.74435 0.279337 8.3719L8.3719 0.279338C8.74435 -0.0931127 9.34821 -0.0931123 9.72066 0.279338C10.0931 0.651787 10.0931 1.25565 9.72066 1.6281L1.6281 9.72066C1.25565 10.0931 0.651787 10.0931 0.279337 9.72066Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mb-5 rounded-md bg-[#F5F7FB] py-4 px-8">
-                                <div class="flex items-center justify-between">
-                                    <span class="truncate pr-3 text-base font-medium text-[#07074D]">
-                                        banner-design.png
-                                    </span>
-                                    <button class="text-[#07074D]">
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 0.279338C0.651787 -0.0931121 1.25565 -0.0931121 1.6281 0.279338L9.72066 8.3719C10.0931 8.74435 10.0931 9.34821 9.72066 9.72066C9.34821 10.0931 8.74435 10.0931 8.3719 9.72066L0.279337 1.6281C-0.0931125 1.25565 -0.0931125 0.651788 0.279337 0.279338Z"
-                                                fill="currentColor" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 9.72066C-0.0931125 9.34821 -0.0931125 8.74435 0.279337 8.3719L8.3719 0.279338C8.74435 -0.0931127 9.34821 -0.0931123 9.72066 0.279338C10.0931 0.651787 10.0931 1.25565 9.72066 1.6281L1.6281 9.72066C1.25565 10.0931 0.651787 10.0931 0.279337 9.72066Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mb-5 rounded-md bg-[#F5F7FB] py-4 px-8">
-                                <div class="flex items-center justify-between">
-                                    <span class="truncate pr-3 text-base font-medium text-[#07074D]">
-                                        banner-design.png
-                                    </span>
-                                    <button class="text-[#07074D]">
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 0.279338C0.651787 -0.0931121 1.25565 -0.0931121 1.6281 0.279338L9.72066 8.3719C10.0931 8.74435 10.0931 9.34821 9.72066 9.72066C9.34821 10.0931 8.74435 10.0931 8.3719 9.72066L0.279337 1.6281C-0.0931125 1.25565 -0.0931125 0.651788 0.279337 0.279338Z"
-                                                fill="currentColor" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M0.279337 9.72066C-0.0931125 9.34821 -0.0931125 8.74435 0.279337 8.3719L8.3719 0.279338C8.74435 -0.0931127 9.34821 -0.0931123 9.72066 0.279338C10.0931 0.651787 10.0931 1.25565 9.72066 1.6281L1.6281 9.72066C1.25565 10.0931 0.651787 10.0931 0.279337 9.72066Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div> -->
                         <listExpacionPanel :data="dataListDocument" title="Documentos">
                             <template #slot-0>
-                                    <input type="file"
-                                        @change="handleDocumentIne_identificacion"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentIne_identificacion"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-1>
-                                    <input type="file"
-                                        @change="handleDocumentComprobante_domicilio_cliente"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentComprobante_domicilio_cliente"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-2>
-                                    <input type="file"
-                                        @change="handleDocumentComprobante_domicilio_alterno"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentComprobante_domicilio_alterno"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-3>
-                                    <input type="file"
-                                        @change="handleDocumentImagen_tarjeta_banco"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentImagen_tarjeta_banco"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-4>
-                                    <input type="file"
-                                        @change="handleDocumentFoto_local_comercial"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentFoto_local_comercial"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-5>
-                                    <input type="file"
-                                        @change="handleDocumentComprobante_ingresos"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleDocumentComprobante_ingresos"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-6>
-                                    <input type="file"
-                                        @change="handleComprobante_domicilio_obligado"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleComprobante_domicilio_obligado"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-7>
-                                    <input type="file"
-                                        @change="handleComprobante_ine_obligado"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleComprobante_ine_obligado"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-8>
-                                    <input type="file"
-                                        @change="handleGarantia_1"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleGarantia_1"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-9>
-                                    <input type="file"
-                                        @change="handleGarantia_2"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleGarantia_2"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                             <template #slot-10>
-                                    <input type="file"
-                                        @change="handleCaratula_cuenta"
-                                        class="border border-gray-300 py-2 px-4 rounded-lg w-full">
-                                </template>
+                                <input type="file" @change="handleCaratula_cuenta"
+                                    class="border border-gray-300 py-2 px-4 rounded-lg w-full">
+                            </template>
                         </listExpacionPanel>
-
+                        <div v-if="BancoDeDatos">
+                            <div class="mb-5 rounded-md bg-[#F5F7FB] py-4 px-8"
+                                v-for="(file, f) in BancoDeDatos.has_many_file_document" :key="f">
+                                <div class="flex items-center justify-between">
+                                    <a class="truncate pr-3 text-base font-medium text-[#07074D]" target="_blank"
+                                        :href="file.documento">
+                                        {{ file.has_one_status_document.nombre_documento }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div>
-                            <button
-                            @click.prevent="addDocumentFile"
+                            <button @click.prevent="addDocumentFile"
                                 class="hover:shadow-form w-full rounded-md bg-[#6A64F1] py-3 px-8 text-center text-base font-semibold text-white outline-none">
                                 Guardar Archivos
                             </button>
@@ -1152,135 +1245,135 @@ onMounted(() => {
 
                             </listExpacionPanel>
                         </div>
-                        <div class="w-full mr-4  bg-white mt-2 border border-gray-200">
-                            <header class="px-5 py-4 border-b border-gray-100">
-                                <h2 class="font-semibold text-gray-800">Customers</h2>
-                            </header>
-                            <div class="p-3">
-                                <div class="overflow-x-auto">
-                                    <table class="table-auto w-full">
-                                        <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
-                                            <tr>
-                                                <th class="p-2 whitespace-nowrap">
-                                                    <div class="font-semibold text-left">Name</div>
-                                                </th>
-                                                <th class="p-2 whitespace-nowrap">
-                                                    <div class="font-semibold text-left">Email</div>
-                                                </th>
-                                                <th class="p-2 whitespace-nowrap">
-                                                    <div class="font-semibold text-left">Spent</div>
-                                                </th>
-                                                <th class="p-2 whitespace-nowrap">
-                                                    <div class="font-semibold text-center">Country</div>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-sm divide-y divide-gray-100">
-                                            <tr>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                class="rounded-full"
-                                                                src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-05.jpg"
-                                                                width="40" height="40" alt="Alex Shatov"></div>
-                                                        <div class="font-medium text-gray-800">Alex Shatov</div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left">alexshatov@gmail.com</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left font-medium text-green-500">$2,890.66</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-lg text-center">??</div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                class="rounded-full"
-                                                                src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-06.jpg"
-                                                                width="40" height="40" alt="Philip Harbach"></div>
-                                                        <div class="font-medium text-gray-800">Philip Harbach</div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left">philip.h@gmail.com</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left font-medium text-green-500">$2,767.04</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-lg text-center">??</div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                class="rounded-full"
-                                                                src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-07.jpg"
-                                                                width="40" height="40" alt="Mirko Fisuk"></div>
-                                                        <div class="font-medium text-gray-800">Mirko Fisuk</div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left">mirkofisuk@gmail.com</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left font-medium text-green-500">$2,996.00</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-lg text-center">??</div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                class="rounded-full"
-                                                                src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-08.jpg"
-                                                                width="40" height="40" alt="Olga Semklo"></div>
-                                                        <div class="font-medium text-gray-800">Olga Semklo</div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left">olga.s@cool.design</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left font-medium text-green-500">$1,220.66</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-lg text-center">??</div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="flex items-center">
-                                                        <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                class="rounded-full"
-                                                                src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-09.jpg"
-                                                                width="40" height="40" alt="Burak Long"></div>
-                                                        <div class="font-medium text-gray-800">Burak Long</div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left">longburak@gmail.com</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-left font-medium text-green-500">$1,890.66</div>
-                                                </td>
-                                                <td class="p-2 whitespace-nowrap">
-                                                    <div class="text-lg text-center">??</div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <!-- <div class="w-full mr-4  bg-white mt-2 border border-gray-200">
+                                <header class="px-5 py-4 border-b border-gray-100">
+                                    <h2 class="font-semibold text-gray-800">Customers</h2>
+                                </header>
+                                <div class="p-3">
+                                    <div class="overflow-x-auto">
+                                        <table class="table-auto w-full">
+                                            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                                                <tr>
+                                                    <th class="p-2 whitespace-nowrap">
+                                                        <div class="font-semibold text-left">Name</div>
+                                                    </th>
+                                                    <th class="p-2 whitespace-nowrap">
+                                                        <div class="font-semibold text-left">Email</div>
+                                                    </th>
+                                                    <th class="p-2 whitespace-nowrap">
+                                                        <div class="font-semibold text-left">Spent</div>
+                                                    </th>
+                                                    <th class="p-2 whitespace-nowrap">
+                                                        <div class="font-semibold text-center">Country</div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-sm divide-y divide-gray-100">
+                                                <tr>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
+                                                                    class="rounded-full"
+                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-05.jpg"
+                                                                    width="40" height="40" alt="Alex Shatov"></div>
+                                                            <div class="font-medium text-gray-800">Alex Shatov</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left">alexshatov@gmail.com</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left font-medium text-green-500">$2,890.66</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-lg text-center">??</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
+                                                                    class="rounded-full"
+                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-06.jpg"
+                                                                    width="40" height="40" alt="Philip Harbach"></div>
+                                                            <div class="font-medium text-gray-800">Philip Harbach</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left">philip.h@gmail.com</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left font-medium text-green-500">$2,767.04</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-lg text-center">??</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
+                                                                    class="rounded-full"
+                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-07.jpg"
+                                                                    width="40" height="40" alt="Mirko Fisuk"></div>
+                                                            <div class="font-medium text-gray-800">Mirko Fisuk</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left">mirkofisuk@gmail.com</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left font-medium text-green-500">$2,996.00</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-lg text-center">??</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
+                                                                    class="rounded-full"
+                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-08.jpg"
+                                                                    width="40" height="40" alt="Olga Semklo"></div>
+                                                            <div class="font-medium text-gray-800">Olga Semklo</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left">olga.s@cool.design</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left font-medium text-green-500">$1,220.66</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-lg text-center">??</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
+                                                                    class="rounded-full"
+                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-09.jpg"
+                                                                    width="40" height="40" alt="Burak Long"></div>
+                                                            <div class="font-medium text-gray-800">Burak Long</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left">longburak@gmail.com</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-left font-medium text-green-500">$1,890.66</div>
+                                                    </td>
+                                                    <td class="p-2 whitespace-nowrap">
+                                                        <div class="text-lg text-center">??</div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div> -->
                     </div>
                 </div>
             </div>
@@ -1367,5 +1460,290 @@ onMounted(() => {
                 </btnPrimary>
             </template>
         </modal>
-    </AppLayout>
-</template>
+        <modal :show="openModalSolicitarCredito" maxWidth="">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3 max-h-fit "
+                    @click="openModalSolicitarCredito = false">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+
+            <template #content>
+                <div class="flex mt-8  rounded-lg bg-white w-full">
+                    <div class="gap-4  grid grid-cols-2 items-center align-middle mx-auto">
+                        <div
+                            class=" text-sm flex flex-col rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
+                            <!-- <img class="h-96 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
+                                src="https://www.portafolio.co/files/article_multimedia/uploads/2022/08/22/630423d442be3.jpeg"
+                                alt="" /> -->
+                            <div class="flex flex-col justify-start p-6">
+                                <div
+                                    class="border-b-2 border-neutral-100 px-6 py-3 dark:border-neutral-600 dark:text-neutral-50">
+                                    Información de credito
+                                </div>
+                                <h5 class="mb-2 text-xl font-medium text-neutral-800 dark:text-neutral-50">
+                                    ¿Cuanto dinero necesitas?
+                                </h5>
+                                <div class="flex justify-end">
+                                    <div class="relative mb-3 w-40">
+                                        <div class="relative mb-4 flex flex-wrap ">
+                                            <span
+                                                class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                                id="basic-addon1">$</span>
+                                            <input type="number" v-model="valueRange" min="3000"
+                                                class="relative m-0 text-right block w-6 min-w-4 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <input v-model="valueRange" min="3000" max="50000" type="range"
+                                        class="transparent h-1.5 w-full cursor-pointer appearance-none rounded-lg border-transparent bg-neutral-200"
+                                        id="customRange1" />
+                                </div>
+                                <div class="flex justify-between">
+                                    <div>$3.000,00</div>
+                                    <div>$50.000,00</div>
+                                </div>
+                                <div class="flex justify-between gap-1 my-2 ">
+                                    <div>
+                                        <label data-te-select-label-ref>Frecuencia de pagos</label>
+                                        <select v-model="ModelTablaCalculo.tipoPago" class="w-full">
+                                            <option value="mensual">
+                                                Mensual
+                                            </option>
+                                            <option value="quincenal">
+                                                Quincenal
+                                            </option>
+                                            <option value="semanal">
+                                                Semanal
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label> Números de periodos</label>
+                                        <input min="0" v-model="ModelTablaCalculo.periodos" type="number"
+                                            class="bg-transparent block border-2 peer px-3 w-full" />
+                                    </div>
+                                </div>
+                                <div class="flex justify-between my-2 gap-2">
+                                    <div class="block rounded-lg bg-white text-center dark:bg-neutral-700">
+                                        <div
+                                            class="border-b-2 border-neutral-100 px-6 dark:border-neutral-600 dark:text-neutral-50">
+                                            Solicitado
+                                        </div>
+                                        <div class="p-2">
+                                            <h5
+                                                class="text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
+                                                {{ formatCurrency(valueRange) }}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="block rounded-lg bg-white text-center dark:bg-neutral-700">
+                                        <div
+                                            class="border-b-2 border-neutral-100 px-6 dark:border-neutral-600 dark:text-neutral-50">
+                                            Valor de la cuota
+                                        </div>
+                                        <div class="p-2">
+                                            <h5
+                                                class="text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
+                                                {{ formatCurrency(CalculateCuota) }}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between my-2 gap-2">
+                                    <button @click.prevent="openSimuladorDeCredito"
+                                        class="shadow bg-[#66c3d1] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                        type="button">
+                                        Simulador de credito
+                                    </button>
+                                    <button @click.prevent="enviarCreditRequest"
+                                        class="shadow bg-[#66c3d1] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                        type="button">
+                                        Quiero mi credito
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <section class="antialiased w-full ">
+                            <div class="w-full  mx-auto bg-white shadow-lg rounded-sm border border-gray-200">
+                                <div class="overflow-x-auto p-3">
+                                    <table class="table-auto w-3/4">
+                                        <tbody>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Monto Prestamo</th>
+                                                <td class="border px-4 py-2"> {{ formatCurrency(valueRange) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Tipo de pago</th>
+                                                <td class="border px-4 py-2">{{ ModelTablaCalculo.tipoPago }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Pagos {{ ModelTablaCalculo.tipoPago }}
+                                                </th>
+                                                <td class="border px-4 py-2 ">
+                                                    <p class="ml-3"> {{ ModelTablaCalculo.pagosMensuales }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left capitalize">Meses</th>
+                                                <td class="border px-4 py-2">
+                                                    <p class="ml-3">{{ CalculateMeses }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Interés mensual</th>
+                                                <td class="border px-4 py-2">
+                                                    <div class="relative flex flex-wrap items-stretch">
+                                                        <input type="nunmber" v-model="ModelTablaCalculo.InteresMensual"
+                                                            class="relative m-0 block w-[30px] min-w-0 flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                                            aria-label="Recipient's username" disabled
+                                                            aria-describedby="basic-addon2" />
+                                                        <span
+                                                            class="flex items-center whitespace-nowrap rounded-r border border-l-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                                            id="basic-addon2">%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Pago Total</th>
+                                                <td class="border px-4 py-2">
+                                                    <div class="relative flex flex-wrap items-stretch">
+                                                        <input type="nunmber" v-model="CalculatePagoTotal"
+                                                            class="relative m-0 block w-[30px] min-w-0 flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                                            aria-label="Recipient's username" disabled
+                                                            aria-describedby="basic-addon2" />
+                                                        <span
+                                                            class="flex items-center whitespace-nowrap rounded-r border border-l-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                                            id="basic-addon2">%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="px-4 w-2/4 py-2 text-left">Pago OLA</th>
+                                                <td class="border px-4 py-2">{{ formatCurrency(CalculatePagoOla) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="flex justify-end my-2 gap-2">
+                                        <!-- <button @click.prevent="openSimuladorDeCredito"
+                                            class="shadow  flex gap-4 justify-around bg-[#66c3d1] max-w-[60%] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                            type="button">
+                                            Si quieres conseguir una mejor oferta o tasa de interes contacta un asesor
+                                            <svg width="35px" height="35px" viewBox="0 0 24 24" class="self-center">
+                                                <g id="Complete">
+                                                    <g id="F-Chevron">
+                                                        <polyline fill="none" id="Right" points="8.5 5 15.5 12 8.5 19"
+                                                            stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" />
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                        </button> -->
+                                        <!-- <button @click.prevent="quieroMimCredito"
+                                                class="shadow bg-[#66c3d1] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                                type="button">
+                                                Quiero mi credito
+                                            </button> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <!-- <btnPrimary @click.prevent="EditUserDocument">
+                    Editar
+                </btnPrimary> -->
+            </template>
+        </modal>
+        <modal :show="openModal">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3" @click="openModal = !openModal">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+
+            <template #content>
+                <!-- <section class="antialiased bg-gray-100 text-gray-600 h-screen px-4" x-data="app"> -->
+                <div class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200 my-2">
+                    <div class="overflow-x-auto">
+                        <table class="table-auto w-full ">
+                            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                                <tr>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Periodo
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Capital
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Interés
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Pago
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Días de pago
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="text-sm divide-y divide-gray-100">
+                                <!-- record 1 -->
+                                <tr v-for="(pago, p) in amortizaciones" :key='p'>
+                                    <td class="p-2">
+                                        <div class="font-medium text-gray-800">
+                                            {{ pago.periodo }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="text-left">
+                                            {{ formatCurrency(pago.capital) }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="text-left font-medium text-green-500">
+                                            {{ formatCurrency(pago.interes) }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="text-left font-medium text-green-500">
+                                            {{ formatCurrency(pago.pago) }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="text-right font-medium text-green-500">
+                                            {{ pago.dias_pago }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- </section> -->
+            </template>
+        </modal>
+    </AppLayout></template>

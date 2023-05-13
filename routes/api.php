@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/asociardar-datos-a-usuario',[BancoDeDatosController::class, 'asociarDocumento'])->name('asociar.datos.a.usuario');
     Route::post('/add-comentario',[ComentarioController::class, 'store'])->name('add.comentario');
     Route::post('/add-document-file',[BancoDeDatosController::class, 'addDocumentFile'])->name('add.document.file');
+    Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
 // });
 
 

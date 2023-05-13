@@ -92,7 +92,7 @@ const saveUploadFile = async () => {
 const geBancoDeDatos = async () => {
     try {
         let { data } = await axios(route('get.banco.de.datos'))
-        BancoDeDatos.value = dataz
+        BancoDeDatos.value = data
     } catch (error) {
         console.log(error)
     }

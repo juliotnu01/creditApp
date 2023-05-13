@@ -39,7 +39,7 @@ Route::get('/credit-request', function () {
     ]);
 })->name('credit.request');
 
-Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
+
 
 
 Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
