@@ -358,6 +358,11 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
         element.show = false
 
     }
+    for (let index = 0; index < dataListDocument.value.length; index++) {
+        const element = dataListDocument.value[index];
+        element.show = false
+
+    }
 
 
     if (newValue == 'PRESTAMO EMERGENTE') {
@@ -525,9 +530,11 @@ const enviarCreditRequest = async () => {
             amortizaciones: amortizaciones.value,
             BancoDeDatos: BancoDeDatos.value,
             UserSelected: UserSelected.value,
-            ProductoSelected: ProductoSelected.value
+            ProductoSelected: ProductoSelected.value,
+            monto_solicitado: valueRange.value
         });
         openModalSolicitarCredito.value = false
+        getUsuarios()
     } catch (error) {
         console.log(error)
     }
@@ -545,7 +552,7 @@ onMounted(async () => {
                 Crear Creditos
             </h2>
         </template>
-        <div class="  grid grid-cols-12  justify-start">
+        <div class="grid grid-cols-12  justify-start">
             <div class=" max-w-[240px] flex flex-col col-span-3 ">
                 <div class="bg-white p-2 rounded-lg text-center">
                     <img src="https://i.ytimg.com/vi/mtXQ-m2xPEY/maxresdefault.jpg" alt=""
@@ -741,8 +748,6 @@ onMounted(async () => {
                         </select>
                     </div>
 
-
-
                     <div class="flex relative" v-if="UserSelected">
                         <input class="pt-2 pb-2 pl-3  h-8 mt-2 bg-slate-100 dark:bg-slate-600 rounded-lg " type="text"
                             placeholder="Write a comment" v-model="modelComentario.comentario" />
@@ -784,7 +789,7 @@ onMounted(async () => {
 
                     </div>
                 </div>
-                <!-- <div v-if="UserSelected"
+                <div v-if="UserSelected"
                     class="max-w-[240] w-[240px] mt-2 py-8 px-6 text-gray-600 rounded-xl border border-gray-200 bg-white">
                     <svg class="w-40 m-auto" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -823,85 +828,8 @@ onMounted(async () => {
                         </div>
                         <span class="block text-center text-gray-500">Compared to last week 13</span>
                     </div>
-                    <table class="mt-6 -mb-2 w-full text-gray-600">
-                        <tbody>
-                            <tr>
-                                <td class="py-2">Tailored ui</td>
-                                <td class="text-gray-500">896</td>
-                                <td>
-                                    <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.4" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="19" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="35" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="51" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <path
-                                            d="M0 7C8.62687 7 7.61194 16 17.7612 16C27.9104 16 25.3731 9 34 9C42.6269 9 44.5157 5 51.2537 5C57.7936 5 59.3731 14.5 68 14.5"
-                                            stroke="url(#paint0_linear_622:13631)" stroke-width="2"
-                                            stroke-linejoin="round" />
-                                        <defs>
-                                            <linearGradient id="paint0_linear_622:13631" x1="68" y1="7.74997" x2="1.69701"
-                                                y2="8.10029" gradientUnits="userSpaceOnUse">
-                                                <stop stop-color="#E323FF" />
-                                                <stop offset="1" stop-color="#7517F8" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Customize</td>
-                                <td class="text-gray-500">1200</td>
-                                <td>
-                                    <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.4" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="19" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="35" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="51" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <path
-                                            d="M0 12.929C8.69077 12.929 7.66833 9.47584 17.8928 9.47584C28.1172 9.47584 25.5611 15.9524 34.2519 15.9524C42.9426 15.9524 44.8455 10.929 51.6334 10.929C58.2217 10.929 59.3092 5 68 5"
-                                            stroke="url(#paint0_linear_622:13640)" stroke-width="2"
-                                            stroke-linejoin="round" />
-                                        <defs>
-                                            <linearGradient id="paint0_linear_622:13640" x1="34" y1="5" x2="34" y2="15.9524"
-                                                gradientUnits="userSpaceOnUse">
-                                                <stop stop-color="#8AFF6C" />
-                                                <stop offset="1" stop-color="#02C751" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-2">Other</td>
-                                <td class="text-gray-500">12</td>
-                                <td>
-                                    <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <rect opacity="0.4" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="19" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="35" width="14" height="21" rx="1" fill="#e4e4f2" />
-                                        <rect opacity="0.4" x="51" width="17" height="21" rx="1" fill="#e4e4f2" />
-                                        <path
-                                            d="M0 6C8.62687 6 6.85075 12.75 17 12.75C27.1493 12.75 25.3731 9 34 9C42.6269 9 42.262 13.875 49 13.875C55.5398 13.875 58.3731 6 67 6"
-                                            stroke="url(#paint0_linear_622:13649)" stroke-width="2"
-                                            stroke-linejoin="round" />
-                                        <defs>
-                                            <linearGradient id="paint0_linear_622:13649" x1="67" y1="7.96873" x2="1.67368"
-                                                y2="8.44377" gradientUnits="userSpaceOnUse">
-                                                <stop stop-color="#FFD422" />
-                                                <stop offset="1" stop-color="#FF7D05" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> -->
+                </div>
             </div>
-
             <div class="w-full flex flex-col mr-4 col-span-9 h-fit" v-show="BancoDeDatos && UserSelected">
                 <div class='flex mb-2 w-full gap-4 text-[9px]'>
                     <div class="rounded-xl w-full border p-5 shadow-md  bg-white">
@@ -933,9 +861,8 @@ onMounted(async () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="p-3 bg-white">
+                <div class="p-3 bg-white border border-solid">
                     <header class="px-5 py-4 border-b border-gray-100">
                         <h2 class="font-semibold text-gray-800">Información General</h2>
                     </header>
@@ -1117,8 +1044,7 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class=" flex gap-2 mt-2">
-                    <div class=" bg-white mb-2 h-fit max-w-xs py-6 px-9">
-
+                    <div class=" bg-white mb-2 h-fit max-w-xs py-6 px-9 border border-solid">
                         <listExpacionPanel :data="dataListDocument" title="Documentos">
                             <template #slot-0>
                                 <input type="file" @change="handleDocumentIne_identificacion"
@@ -1183,8 +1109,8 @@ onMounted(async () => {
                             </button>
                         </div>
                     </div>
-                    <div class=" flex flex-col ">
-                        <div class="bg-white border h-full  w-full">
+                    <div class=" flex flex-col  w-10/12  h-fit">
+                        <div class="bg-white  h-full border border-solid ">
                             <listExpacionPanel :data="dataList" title="Preguntas y respuestas">
                                 <template #slot-0>
                                     <input v-model="BancoDeDatos.principal_fuente_de_ingreso" type="text"
@@ -1245,135 +1171,65 @@ onMounted(async () => {
 
                             </listExpacionPanel>
                         </div>
-                        <!-- <div class="w-full mr-4  bg-white mt-2 border border-gray-200">
-                                <header class="px-5 py-4 border-b border-gray-100">
-                                    <h2 class="font-semibold text-gray-800">Customers</h2>
-                                </header>
-                                <div class="p-3">
-                                    <div class="overflow-x-auto">
-                                        <table class="table-auto w-full">
-                                            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
-                                                <tr>
-                                                    <th class="p-2 whitespace-nowrap">
-                                                        <div class="font-semibold text-left">Name</div>
-                                                    </th>
-                                                    <th class="p-2 whitespace-nowrap">
-                                                        <div class="font-semibold text-left">Email</div>
-                                                    </th>
-                                                    <th class="p-2 whitespace-nowrap">
-                                                        <div class="font-semibold text-left">Spent</div>
-                                                    </th>
-                                                    <th class="p-2 whitespace-nowrap">
-                                                        <div class="font-semibold text-center">Country</div>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="text-sm divide-y divide-gray-100">
-                                                <tr>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="flex items-center">
-                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                    class="rounded-full"
-                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-05.jpg"
-                                                                    width="40" height="40" alt="Alex Shatov"></div>
-                                                            <div class="font-medium text-gray-800">Alex Shatov</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left">alexshatov@gmail.com</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left font-medium text-green-500">$2,890.66</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-lg text-center">??</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="flex items-center">
-                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                    class="rounded-full"
-                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-06.jpg"
-                                                                    width="40" height="40" alt="Philip Harbach"></div>
-                                                            <div class="font-medium text-gray-800">Philip Harbach</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left">philip.h@gmail.com</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left font-medium text-green-500">$2,767.04</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-lg text-center">??</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="flex items-center">
-                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                    class="rounded-full"
-                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-07.jpg"
-                                                                    width="40" height="40" alt="Mirko Fisuk"></div>
-                                                            <div class="font-medium text-gray-800">Mirko Fisuk</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left">mirkofisuk@gmail.com</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left font-medium text-green-500">$2,996.00</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-lg text-center">??</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="flex items-center">
-                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                    class="rounded-full"
-                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-08.jpg"
-                                                                    width="40" height="40" alt="Olga Semklo"></div>
-                                                            <div class="font-medium text-gray-800">Olga Semklo</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left">olga.s@cool.design</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left font-medium text-green-500">$1,220.66</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-lg text-center">??</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="flex items-center">
-                                                            <div class="w-10 h-10 flex-shrink-0 mr-2 sm:mr-3"><img
-                                                                    class="rounded-full"
-                                                                    src="https://raw.githubusercontent.com/cruip/vuejs-admin-dashboard-template/main/src/images/user-36-09.jpg"
-                                                                    width="40" height="40" alt="Burak Long"></div>
-                                                            <div class="font-medium text-gray-800">Burak Long</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left">longburak@gmail.com</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-left font-medium text-green-500">$1,890.66</div>
-                                                    </td>
-                                                    <td class="p-2 whitespace-nowrap">
-                                                        <div class="text-lg text-center">??</div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div> -->
+                        
+                    </div>
+                </div>
+                <div class="w-full mr-4  bg-white mt-2 border border-gray-200" v-if="UserSelected">
+                    <header class="px-5 py-4 border-b border-gray-100">
+                        <h2 class="font-semibold text-gray-800">Historial de creditos</h2>
+                    </header>
+                    <div class="p-3">
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full ]">
+                                <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                                    <tr>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-left">Identificador</div>
+                                        </th>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-left">Monto Solicitado</div>
+                                        </th>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-left">Producto Solicitado</div>
+                                        </th>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-center">Status</div>
+                                        </th>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-left">Fecha Solicitud</div>
+                                        </th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-100">
+                                    <tr  v-for="(credito,c) in UserSelected.has_many_credits_requests" :key="c" >
+                                        <td class="p-2 whitespace-nowrap text-[10px]">
+                                            <div class="text-left">{{credito.uui}}</div>
+                                        </td>
+                                        <td class="p-2 text-left">
+                                            <span class="">{{ formatCurrency(credito.monto_de_dinero_solicitado) }}</span>
+                                        </td>
+                                        <td class="p-2 text-left">  
+                                            <span class="">{{ credito.producto_solicitado }}</span>
+                                        </td>
+                                        <td class="p-2 whitespace-nowrap">
+                                            <div class="text-left font-medium text-green-500 text-[10px]">
+                                                <span
+                                                    :class="{ 'bg-yellow-200 text-black py-1 px-3 rounded-full ': credito.status == 0, 'bg-orange-400 text-black py-1 px-3 rounded-full ': credito.status == 1, 'bg-red-400 text-white py-1 px-3 rounded-full ': credito.status == 2 }">
+                                                    {{ credito.status == 0 ? 'Credito pendiente por revisar' : credito.status == 1 ?
+                                                        'Credito aprobado para estudio' : credito.status == 2 ? 'Credito Rechazado' : ''
+                                                    }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="p-2 text-center">  
+                                            <span class="">{{ credito.created_at.substr(0,10) }}</span>
+                                        </td>
+                                        
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1711,7 +1567,6 @@ onMounted(async () => {
                             </thead>
 
                             <tbody class="text-sm divide-y divide-gray-100">
-                                <!-- record 1 -->
                                 <tr v-for="(pago, p) in amortizaciones" :key='p'>
                                     <td class="p-2">
                                         <div class="font-medium text-gray-800">
@@ -1746,4 +1601,5 @@ onMounted(async () => {
                 <!-- </section> -->
             </template>
         </modal>
-    </AppLayout></template>
+        </AppLayout>
+    </template>

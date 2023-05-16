@@ -65,6 +65,7 @@ class CreditRequestController extends Controller
         try {
             return DB::transaction(function () use ($request) {
 
+
                 $creditRequest = new CreditRequest();
                 $creditRequest->nombre_supervisor_ola = $request->BancoDeDatos['nombre_supervisor_ola'];
                 $creditRequest->ciudad = $request->BancoDeDatos['ciudad'];
@@ -77,7 +78,7 @@ class CreditRequestController extends Controller
                 $creditRequest->comprobante_domicilio_alterno = $request->BancoDeDatos['comprobante_domicilio_alterno'];
                 $creditRequest->tipo_de_relacion_persona_titular_comprobante_domicilio_alterno = $request->BancoDeDatos['tipo_de_relacion_persona_titular_comprobante_domicilio_alterno'];
                 $creditRequest->principal_fuente_de_ingreso = $request->BancoDeDatos['principal_fuente_de_ingreso'];
-                $creditRequest->producto_solicitado = $request->BancoDeDatos['producto_solicitado'];
+                $creditRequest->producto_solicitado = $request->ProductoSelected;
                 $creditRequest->dinero_solicitado = $request->BancoDeDatos['dinero_solicitado'];
                 $creditRequest->razon_credito = $request->BancoDeDatos['razon_credito'];
                 $creditRequest->en_que_tiempo_piensa_pagar = $request->BancoDeDatos['en_que_tiempo_piensa_pagar'];
@@ -106,6 +107,7 @@ class CreditRequestController extends Controller
                 $creditRequest->caratula_del_estado_de_cuenta = $request->BancoDeDatos['caratula_del_estado_de_cuenta'];
                 $creditRequest->user_id = $request->UserSelected['id'];
                 $creditRequest->uui = (string)Str::uuid();    
+                $creditRequest->monto_de_dinero_solicitado = $request->monto_solicitado;    
                 $creditRequest->save();
 
 

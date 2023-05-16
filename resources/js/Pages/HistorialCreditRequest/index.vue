@@ -58,7 +58,6 @@ const calculoPagosMensual = computed({
         formulario.value.pagos_mensuales = val
     }
 })
-
 const CalculateMeses = computed({
     get() {
         formulario.value.meses = parseInt((formulario.value.numeros_de_periodos / formulario.value.pagos_mensuales))

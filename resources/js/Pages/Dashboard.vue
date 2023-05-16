@@ -454,4 +454,5 @@ onBeforeMount(() => {
                 </div>
             </template>
         </modal>
-    </AppLayout></template>
+    </AppLayout>
+</template>
