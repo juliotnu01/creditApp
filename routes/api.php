@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/add-comentario',[ComentarioController::class, 'store'])->name('add.comentario');
     Route::post('/add-document-file',[BancoDeDatosController::class, 'addDocumentFile'])->name('add.document.file');
     Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
+    Route::put('/update-document-status', [BancoDeDatosController::class, 'updateDocumentStatus'])->name('update.document.status');
 // });
 
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{BancoDeDatos, DocumentosDeBancoDeDatos};
+use App\Models\{BancoDeDatos, DocumentosDeBancoDeDatos, StatusDocumento};
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -299,5 +299,15 @@ class BancoDeDatosController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    public function updateDocumentStatus(Request $request)
+    {
+        return DB::transaction(function () use ($request) {
+
+            
+            $StatusDocumento = new StatusDocumento();
+            $StatusDocumento->find($request->id)->update($request->all());
+        });
     }
 }

@@ -24,7 +24,7 @@ class UserController extends Controller
                 'hasManyCreditsRequests', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
-                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument', 
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
                 'hasManyComentarios', 
                 'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id)->get();
@@ -41,7 +41,7 @@ class UserController extends Controller
                 'hasManyCreditsRequests', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
-                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument', 
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
                 'hasManyComentarios',
                 'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id)->where('raw_rol', 'cliente')->get();
@@ -58,7 +58,7 @@ class UserController extends Controller
                 'hasManyCreditsRequests', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
-                'hasOneDocument.hasManyFileDocument',
+                'hasOneDocument.hasManyFileDocument', 
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
                 'hasManyComentarios',
                 'hasManyComentarios.WhoDidComment')->where('id', $id)->first();
