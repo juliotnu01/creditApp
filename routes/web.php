@@ -72,8 +72,8 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
             return Inertia::render('CrearCreditos/index');
         })->name('index');
     
-        Route::get('/analizis', function () {
-            return Inertia::render('CrearCreditos/AnalizisCredito');
+        Route::get('/analizis/{user?}/{uui?}', function ($user = '', $uui = '') {
+            return Inertia::render('CrearCreditos/AnalizisCredito', ["user" => $user, "uui" => $uui]);
         })->name('analizis');
     });
 });

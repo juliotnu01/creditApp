@@ -108,6 +108,13 @@ class CreditRequestController extends Controller
                 $creditRequest->user_id = $request->UserSelected['id'];
                 $creditRequest->uui = (string)Str::uuid();    
                 $creditRequest->monto_de_dinero_solicitado = $request->monto_solicitado;    
+                $creditRequest->tipo_de_pago = $request->tipo_de_pago;    
+                $creditRequest->pagos_mensuales = $request->pagos_mensuales;    
+                $creditRequest->numeros_de_periodos = $request->numero_de_periodos;    
+                $creditRequest->meses = $request->meses;    
+                $creditRequest->interes_mensual = $request->interes_mensual;    
+                $creditRequest->pago_total = $request->pago_total;    
+                $creditRequest->pago_ola = $request->pago_ola;    
                 $creditRequest->save();
 
 
@@ -119,7 +126,7 @@ class CreditRequestController extends Controller
                     $amort->interes = $element['interes'];
                     $amort->capital = $element['capital'];
                     $amort->pago = $element['pago'];
-                    $amort->dias_pago = date("Y-m-d", strtotime($element['dias_pago']));
+                    $amort->dias_pago = Carbon::createFromFormat('d \d\e F \d\e\l Y', $element['dias_pago'])->format('Y-m-d'); 
                     $amort->uui_credit_request = $creditRequest->uui;
                     $amort->credit_request_id = $creditRequest->id;
                     $amort->save();

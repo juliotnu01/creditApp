@@ -2,7 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted, watch, computed } from 'vue';
 import PrimaryButton from '../../Components/PrimaryButton.vue'
-import btnPrimary from '../../Components/PrimaryButton.vue'
+// import btnPrimary from '../../Components/PrimaryButton.vue'
 import listExpacionPanel from "../../Components/listWithExpancionPanel.vue";
 import modal from "../../Components/DialogModal.vue";
 import moment from "moment";
@@ -10,6 +10,8 @@ import { useCreditRequest } from '../../stores/creditRequest'
 
 const props = defineProps({
     isCliente: Boolean,
+    user: String,
+    uui: String
 });
 
 const openModal = ref(false);
@@ -35,12 +37,14 @@ const Fecha = ref(null);
 const usuarios = ref([]);
 const results = ref([]);
 const filteredResults = ref([]);
+const filteredResultsHistoryCreditRequest = ref([]);
 const searchTerm = ref('');
 const BancoDeDatos = ref(false);
 const UserSelected = ref(false);
 const ProductoSelected = ref('Selecciona el producto');
 const openModalEditUser = ref(false);
 const openModalSolicitarCredito = ref(false);
+const openModalViewAmortizaciones = ref(false);
 const headerTableBancoDeDatos = ref([
     { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '', show: false },
     { header: "Ciudad ", fixed: false, value: '', class: '', show: false },
@@ -100,6 +104,14 @@ const modelDocument = ref({
     garantia_2: null,
     caratula_cuenta: null,
 });
+const formulario = computed({
+    get() {
+        return storeCreditRequest.formulario
+    },
+    set(val) {
+        storeCreditRequest.setformulario(val)
+    }
+})
 
 const handleDocumentIne_identificacion = (e) => {
     modelDocument.value.ine_identificacion = e.target.files[0]
@@ -240,12 +252,22 @@ const selectResult = (result) => {
     BancoDeDatos.value = UserSelected.value.has_one_document ?? false
     filteredResults.value = []
     searchTerm.value = result.name
+    filterResultsHistoryCreditRequest()
 }
 const filterResults = () => {
     filteredResults.value = results.value.filter(result =>
 
         result.name.toString().toLowerCase().includes(searchTerm.value.toLowerCase())
     );
+}
+const filterResultsHistoryCreditRequest = () => {
+    filteredResultsHistoryCreditRequest.value = UserSelected.value.has_many_credits_requests.filter(result =>
+
+        result.uui.toString().toLowerCase().includes(props.uui.toLowerCase())
+    );
+    ProductoSelected.value = filteredResultsHistoryCreditRequest.value[0].producto_solicitado.toUpperCase()
+
+
 }
 const consutarUsuario = async () => {
     BancoDeDatos.value = UserSelected.value.has_one_document
@@ -327,6 +349,23 @@ const openSimuladorDeCredito = async () => {
         storeCreditRequest.setAmortizaciones(element)
     }
     openModal.value = true
+}
+const viewSolicitudDeCredito = async (credito) => {
+
+    
+    while (amortizaciones.value.length > 0) {
+        amortizaciones.value.splice(0, 1);
+    }
+    for (let index = 0; index < credito.has_many_amortizaciones.length; index++) {
+        const element = credito.has_many_amortizaciones[index];
+        amortizaciones.value = element
+    }
+    valueRange.value = credito.monto_de_dinero_solicitado
+    ModelTablaCalculo.value.tipoPago = credito.tipo_de_pago
+    ModelTablaCalculo.value.pagosMensuales = credito.pagos_mensuales
+    ModelTablaCalculo.value.InteresMensual = credito.interes_mensual
+    ModelTablaCalculo.value.periodos = credito.numeros_de_periodos
+    openModalViewAmortizaciones.value = true
 }
 watch(() => ModelTablaCalculo, (newValue, oldValue) => {
     switch (newValue.value.tipoPago) {
@@ -544,17 +583,31 @@ const enviarCreditRequest = async () => {
 }
 
 const updateDocument = async (documentStatus, denie = null) => {
-    try{
-        if(denie === false){
+    try {
+        if (denie === false) {
             documentStatus.status = 2
         }
         await axios.put(route('update.document.status'), documentStatus)
-    }catch(e){
+    } catch (e) {
         console.log(e)
     }
 }
-onMounted(() => {
-    getUsuarios()
+onMounted(async () => {
+    await getUsuarios()
+    if (props.user) {
+        filteredResults.value = results.value.filter(result =>
+
+
+            result.name.toString().toLowerCase().includes(props.user.toLowerCase())
+        );
+        await selectResult(filteredResults.value[0])
+        filterResultsHistoryCreditRequest()
+    } else {
+
+        filteredResults.value = results.value
+        filterResultsHistoryCreditRequest()
+    }
+
 })
 </script>
 <template>
@@ -818,7 +871,7 @@ onMounted(() => {
                     </button>
 
                     <div class=" w-full my-2 flex justify-center " v-if="UserSelected">
-                        <select v-model="ProductoSelected"
+                        <select v-model="ProductoSelected" disabled
                             class="bg-gray-50 border text-[9px] w-[225px] border-gray-300 text-gray-900 h-fit rounded-lg   pr-6 ">
                             <option selected>Selecciona el producto</option>
                             <option value="PRESTAMO EMERGENTE">PRESTAMO EMERGENTE</option>
@@ -901,11 +954,14 @@ onMounted(() => {
                                         <th class="p-2">
                                             <div class="font-semibold text-left">Fecha Solicitud</div>
                                         </th>
+                                        <th class="p-2">
+                                            <div class="font-semibold text-left">Acción</div>
+                                        </th>
 
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-100">
-                                    <tr v-for="(credito, c) in UserSelected.has_many_credits_requests" :key="c">
+                                    <tr v-for="(credito, c) in filteredResultsHistoryCreditRequest" :key="c">
                                         <td class="p-2 whitespace-nowrap text-[10px]">
                                             <div class="text-left">{{ credito.uui }}</div>
                                         </td>
@@ -927,6 +983,22 @@ onMounted(() => {
                                         </td>
                                         <td class="p-2 text-center">
                                             <span class="">{{ credito.created_at.substr(0, 10) }}</span>
+                                        </td>
+                                        <td class="py-3 px-3 text-center">
+                                            <div class="flex item-center justify-center">
+                                                <div class="w-4 mr-2 transform  hover:scale-110"
+                                                    @click="viewSolicitudDeCredito(credito)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </div>
+
+                                            </div>
                                         </td>
 
                                     </tr>
@@ -997,28 +1069,27 @@ onMounted(() => {
 
                                         </td>
                                         <td class="p-2 text-center flex item-center justify-center gab-2">
-                                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                                <input class="self-center align-middle h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-4 after:w-4 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-4 checked:after:w-4 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-4 focus:after:w-4 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
+                                            <div
+                                                class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+
+                                                <input
+                                                    class="self-center align-middle h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-neutral-300 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-4 after:w-4 after:rounded-full after:border-none after:bg-neutral-100 after:shadow-[0_0px_3px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-4 checked:after:w-4 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-4 focus:after:w-4 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
                                                     type="checkbox"
-                                                    
                                                     @change="updateDocument(documento.has_one_status_document)"
-                                                    v-model="documento.has_one_status_document.status"
-                                                    :checked="documento.has_one_status_document.status.toString() == '1' ? true : false"
-                                                    />
+                                                    v-model="documento.has_one_status_document.status" />
+
                                             </div>
                                             <div class="w-4 mr-2 transform hover:text-red-500 hover:scale-110 self-center align-middle"
-                                            @click.prevent="updateDocument(documento.has_one_status_document, false)"
-                                            >
-                                            <svg fill="#000000" height="15px" width="15px" viewBox="0 0 329.328 329.328"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
+                                                @click.prevent="updateDocument(documento.has_one_status_document, false)">
+                                                <svg fill="#000000" height="15px" width="15px" viewBox="0 0 329.328 329.328"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M164.666,0C73.871,0,0.004,73.871,0.004,164.672c0.009,90.792,73.876,164.656,164.662,164.656
                                                     c90.793,0,164.658-73.865,164.658-164.658C329.324,73.871,255.459,0,164.666,0z M164.666,30c31.734,0,60.933,11.042,83.975,29.477
                                                     L59.478,248.638c-18.431-23.04-29.471-52.237-29.474-83.967C30.004,90.413,90.413,30,164.666,30z M164.666,299.328
                                                     c-31.733,0-60.934-11.042-83.977-29.477L269.854,80.691c18.431,23.043,29.471,52.244,29.471,83.979
                                                     C299.324,238.921,238.917,299.328,164.666,299.328z" />
-                                            </svg>
-                                        </div>
+                                                </svg>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1029,7 +1100,263 @@ onMounted(() => {
             </div>
         </div>
 
+        <modal :show="openModalViewAmortizaciones" maxWidth="">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    @click="openModalViewAmortizaciones = !openModalViewAmortizaciones">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
 
+            <template #content>
+                <div class="p-6 bg-white flex justify-center gap-4">
+                    <section class="antialiased w-full ">
+                        <div class="w-full  mx-auto bg-white shadow-lg rounded-sm border border-gray-200">
+                            <div class="overflow-x-auto p-3">
+                                <table class="table-auto w-3/4">
+                                    <tbody>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Monto Prestamo</th>
+                                            <td class="border px-4 py-2"> {{ formatCurrency(valueRange) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Tipo de pago</th>
+                                            <td class="border px-4 py-2">
+                                                <div>
+                                                    <select v-model="ModelTablaCalculo.tipoPago" class="w-full">
+                                                        <option value="mensual">
+                                                            Mensual
+                                                        </option>
+                                                        <option value="quincenal">
+                                                            Quincenal
+                                                        </option>
+                                                        <option value="semanal">
+                                                            Semanal
+                                                        </option>
+                                                    </select>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Periodos</th>
+                                            <td class="border px-4 py-2">
+                                                <div>
+                                                    <input min="0" v-model="ModelTablaCalculo.periodos" type="number"
+                                                        class="bg-transparent block border-2 peer px-3 w-full" />
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Pagos {{ ModelTablaCalculo.tipoPago }}
+                                            </th>
+                                            <td class="border px-4 py-2 ">
+                                                <p class="ml-3"> {{ ModelTablaCalculo.pagosMensuales }}</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left capitalize">Meses</th>
+                                            <td class="border px-4 py-2">
+                                                <p class="ml-3">{{ CalculateMeses }}</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Interés mensual</th>
+                                            <td class="border px-4 py-2">
+                                                <div class="relative flex flex-wrap items-stretch">
+                                                    <input type="nunmber" v-model="ModelTablaCalculo.InteresMensual"
+                                                        class="relative m-0 block w-[30px] min-w-0 flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                                        aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                                                    <span
+                                                        class="flex items-center whitespace-nowrap rounded-r border border-l-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                                        id="basic-addon2">%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Pago Total</th>
+                                            <td class="border px-4 py-2">
+                                                <div class="relative flex flex-wrap items-stretch">
+                                                    <input type="nunmber" v-model="CalculatePagoTotal"
+                                                        class="relative m-0 block w-[30px] min-w-0 flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                                        aria-label="Recipient's username" aria-describedby="basic-addon2" />
+                                                    <span
+                                                        class="flex items-center whitespace-nowrap rounded-r border border-l-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                                                        id="basic-addon2">%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Pago OLA</th>
+                                            <td class="border px-4 py-2">{{ formatCurrency(CalculatePagoOla) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="flex justify-end my-2 gap-2">
+                                    <!-- <button @click.prevent="openSimuladorDeCredito"
+                                        class="shadow  flex gap-4 justify-around bg-[#66c3d1] max-w-[60%] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                        type="button">
+                                        Si quieres conseguir una mejor oferta o tasa de interes contacta un asesor
+                                        <svg width="35px" height="35px" viewBox="0 0 24 24" class="self-center">
+                                            <g id="Complete">
+                                                <g id="F-Chevron">
+                                                    <polyline fill="none" id="Right" points="8.5 5 15.5 12 8.5 19"
+                                                        stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                    </button> -->
+                                    <!-- <button @click.prevent="quieroMimCredito"
+                                            class="shadow bg-[#66c3d1] hover:bg-[#2cb6cb] focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                                            type="button">
+                                            Quiero mi credito
+                                        </button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="bg-white shadow-md rounded my-6">
+                    <table class="table-auto w-full ">
+                        <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                            <tr>
+                                <th class="p-2">
+                                    <div class="font-semibold text-left">
+                                        Periodo
+                                    </div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="font-semibold text-left">
+                                        Capital
+                                    </div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="font-semibold text-left">
+                                        Interés
+                                    </div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="font-semibold text-left">
+                                        Pago
+                                    </div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="font-semibold text-right">
+                                        Días de pago
+                                    </div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="font-semibold text-center">
+                                        Aciones
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="text-sm divide-y divide-gray-100">
+
+                            <tr v-for="(pago, p) in amortizaciones" :key='p'>
+                                <td class="p-2">
+                                    <div class="font-medium text-gray-800">
+                                        {{ pago.periodo }}
+                                    </div>
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-left">
+                                        {{ formatCurrency(pago.capital) }}
+                                    </div>
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-left font-medium text-green-500">
+                                        {{ formatCurrency(pago.interes) }}
+                                    </div>
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-left font-medium text-green-500">
+                                        {{ formatCurrency(pago.pago) }}
+                                    </div>
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-right font-medium text-green-500">
+                                        {{ pago.dias_pago }}
+                                    </div>
+                                </td>
+                                <td class="py-3 px-6 text-center">
+                                    <div class="flex item-center justify-center">
+                                        <div class="w-4 mr-2 transform  hover:scale-110"
+                                            @click="AddReciboDePagoARecaudo(pago)">
+                                            <svg width="15px" height="15px" viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none">
+                                                <path fill="#000000" fill-rule="evenodd"
+                                                    d="M9 12a1 1 0 102 0V4.26l3.827 3.48a1 1 0 001.346-1.48l-5.5-5a1 1 0 00-1.346 0l-5.5 5a1 1 0 101.346 1.48L9 4.26V12zm-5.895-.796A1 1 0 001.5 12v3.867a2.018 2.018 0 002.227 2.002c1.424-.147 3.96-.369 6.273-.369 2.386 0 5.248.236 6.795.383a2.013 2.013 0 002.205-2V12a1 1 0 10-2 0v3.884l-13.895-4.68zm0 0L2.5 11l.605.204zm0 0l13.892 4.683a.019.019 0 01-.007.005h-.006c-1.558-.148-4.499-.392-6.984-.392-2.416 0-5.034.23-6.478.38h-.009a.026.026 0 01-.013-.011V12a.998.998 0 00-.394-.796z" />
+                                            </svg>
+                                        </div>
+                                        <div class="w-4 mr-2 transform  hover:scale-110">
+                                            <a :href="pago.ruta_recibo_de_pago" target="_blank"
+                                                class="flex items-center text-gray-600 mb-2">
+                                                <svg width="15px" height="15px" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <title />
+                                                    <g id="Complete">
+                                                        <g id="download">
+                                                            <g>
+                                                                <path d="M3,12.3v7a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2v-7"
+                                                                    fill="none" stroke="#000000" stroke-linecap="round"
+                                                                    stroke-linejoin="round" stroke-width="2" />
+                                                                <g>
+                                                                    <polyline data-name="Right" fill="none" id="Right-2"
+                                                                        points="7.9 12.3 12 16.3 16.1 12.3" stroke="#000000"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" />
+
+                                                                    <line fill="none" stroke="#000000"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" x1="12" x2="12" y1="2.7"
+                                                                        y2="14.2" />
+                                                                </g>
+                                                            </g>
+                                                        </g>
+                                                    </g>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                        <div class="w-4 mr-2 transform  hover:scale-110">
+                                            <p class="flex items-center text-gray-600 mb-2">
+                                                <span :class="{
+                                                    'w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0': pago.status == null,
+                                                    'w-4 h-4 mr-2 inline-flex items-center justify-center bg-yellow-400 text-black rounded-full flex-shrink-0': pago.status == 0,
+                                                    'w-4 h-4 mr-2 inline-flex items-center justify-center bg-green-400 text-white rounded-full flex-shrink-0': pago.status == 1,
+                                                    'w-4 h-4 mr-2 inline-flex items-center justify-center bg-red-400 text-white rounded-full flex-shrink-0': pago.status == 2
+                                                }">
+                                                    <svg fill="none" stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2.5" class="w-3 h-3"
+                                                        viewBox="0 0 24 24">
+                                                        <path d="M20 6L9 17l-5-5"></path>
+                                                    </svg>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template #footer>
+                <div class="flex justify-end">
+                    <!-- <btnPrimay @click.prevent="enviarCreditoAEstudio(formulario)">Enviar a estudio</btnPrimay> -->
+                </div>
+            </template>
+        </modal>
 
 
 

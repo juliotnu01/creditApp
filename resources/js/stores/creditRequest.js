@@ -79,11 +79,14 @@ export const useCreditRequest = defineStore('creditRequest', {
             this.tablaAmortizaciones = data
         },
         setValueRange(data) {
+            // console.log({data})
             this.formulario.monto_de_dinero_solicitado = data
             this.valueRange = data
         },
         setAmortizaciones(data) {
-            this.getteramortizaciones.push(data)
+
+            this.amortizaciones.push(data)
+
         },
         setformulario(data) {
             this.formulario = data

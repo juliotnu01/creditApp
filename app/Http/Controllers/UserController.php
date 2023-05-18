@@ -22,6 +22,7 @@ class UserController extends Controller
 
             $users = User::with(
                 'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.hasManyAmortizaciones', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
                 'hasOneDocument.hasManyFileDocument', 
@@ -39,11 +40,12 @@ class UserController extends Controller
 
             $users = User::with(
                 'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.hasManyAmortizaciones', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
                 'hasOneDocument.hasManyFileDocument', 
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
-                'hasManyComentarios',
+                'hasManyComentarios', 
                 'hasManyComentarios.WhoDidComment')->where('id', "<>", Auth()->user()->id)->where('raw_rol', 'cliente')->get();
             return response()->json($users);
         } catch (\Throwable $th) {
@@ -56,11 +58,12 @@ class UserController extends Controller
 
             $user = User::with(
                 'hasManyCreditsRequests', 
+                'hasManyCreditsRequests.hasManyAmortizaciones', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
                 'hasOneDocument.hasManyFileDocument', 
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
-                'hasManyComentarios',
+                'hasManyComentarios', 
                 'hasManyComentarios.WhoDidComment')->where('id', $id)->first();
             return response()->json($user);
         } catch (\Throwable $th) {

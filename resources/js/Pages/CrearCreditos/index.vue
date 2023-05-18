@@ -518,7 +518,6 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
 }, { deep: true })
 const enviarCreditRequest = async () => {
     try {
-
         Fecha.value = moment();
         var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
         amortizaciones.value.splice(0, amortizaciones.value.length);
@@ -531,7 +530,14 @@ const enviarCreditRequest = async () => {
             BancoDeDatos: BancoDeDatos.value,
             UserSelected: UserSelected.value,
             ProductoSelected: ProductoSelected.value,
-            monto_solicitado: valueRange.value
+            monto_solicitado: valueRange.value,
+            tipo_de_pago:  ModelTablaCalculo.value.tipoPago,
+            pagos_mensuales: ModelTablaCalculo.value.pagosMensuales,
+            numero_de_periodos: ModelTablaCalculo.value.periodos,
+            meses: CalculateMeses.value,
+            interes_mensual: ModelTablaCalculo.value.InteresMensual,
+            pago_total: CalculatePagoTotal.value,
+            pago_ola: CalculatePagoOla.value,
         });
         openModalSolicitarCredito.value = false
         getUsuarios()
@@ -920,7 +926,7 @@ onMounted(async () => {
                                         <span>{{ BancoDeDatos.producto_solicitado ?? '' }}</span>
                                     </td>
                                     <td class="py-3 px-6 text-center" v-show="headerTableBancoDeDatos[12].show">
-                                        <span>{{ BancoDeDatos.dinero_solicitado ??
+                                        <span>{{ BancoDeDatos.monto_de_dinero_solicitado ??
                                             ''
                                         }}</span>
                                     </td>
