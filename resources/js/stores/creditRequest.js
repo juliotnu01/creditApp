@@ -49,7 +49,9 @@ export const useCreditRequest = defineStore('creditRequest', {
             ine_o_identificacion_oficial: '',
             numero_curp_obligado: '',
             file_comprobante_de_domicilio: '',
-            domicilio: ''
+            domicilio: '',
+            uui: '',
+            id: '',
         },
         tablaAmortizaciones: [],
         valueRange: 3000,

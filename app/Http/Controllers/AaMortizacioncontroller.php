@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aamortizacion;
+use App\Models\{Aamortizacion,CreditRequest};
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Storage;
@@ -104,6 +104,17 @@ class AaMortizacioncontroller extends Controller
     {
         try {
             Aamortizacion::where('uui_credit_request', $request->uui_credit_request)->delete();
+            CreditRequest::find($request['credit_request_id'])->update([
+                "tipo_de_pago" => $request['tablaCalculo']['tipoPago'],
+                "pagos_mensuales" => $request['tablaCalculo']['pagosMensuales'],
+                "numeros_de_periodos" => $request['tablaCalculo']['periodos'],
+                "meses" => $request['tablaCalculo']['Meses'],
+                "interes_mensual" => $request['tablaCalculo']['InteresMensual'],
+                "pago_total" => $request['tablaCalculo']['pagoTotal'],
+                "pago_ola" => $request['tablaCalculo']['PagoOla'],
+                "cuota" => $request['tablaCalculo']['cuota'],
+            ]);
+
             for ($i = 0; $i < count($request->amortizaciones); $i++) {
                 $element  = $request->amortizaciones[$i];
                 

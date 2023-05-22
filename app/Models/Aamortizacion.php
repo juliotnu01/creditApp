@@ -12,4 +12,9 @@ class Aamortizacion extends Model
     protected $table = "amortizacions";
 
     protected $guarded = [];
+
+    public function hasOneScore()
+    {
+        return $this->hasOne(ScoreAmortizacion::class, 'amortizacions_id');
+    }
 }

@@ -2,7 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted, watch, computed } from 'vue';
 import PrimaryButton from '../../Components/PrimaryButton.vue'
-// import btnPrimary from '../../Components/PrimaryButton.vue'
+import btnPrimary from '../../Components/PrimaryButton.vue'
 import listExpacionPanel from "../../Components/listWithExpancionPanel.vue";
 import modal from "../../Components/DialogModal.vue";
 import moment from "moment";
@@ -36,6 +36,9 @@ const valueRange = computed({
 const Fecha = ref(null);
 const usuarios = ref([]);
 const results = ref([]);
+const Totalresults = ref(null);
+const ClienteDesderesults = ref(null);
+const UltimoPrestamoresults = ref(null);
 const filteredResults = ref([]);
 const filteredResultsHistoryCreditRequest = ref([]);
 const searchTerm = ref('');
@@ -247,11 +250,14 @@ const getUsuarios = async () => {
         console.log(error)
     }
 }
-const selectResult = (result) => {
-    UserSelected.value = result
+const selectResult = (resultSelect) => {
+    UserSelected.value = resultSelect
     BancoDeDatos.value = UserSelected.value.has_one_document ?? false
     filteredResults.value = []
-    searchTerm.value = result.name
+    Totalresults.value = resultSelect.has_many_credits_requests.length
+    ClienteDesderesults.value = resultSelect.created_at
+    UltimoPrestamoresults.value = resultSelect.has_many_credits_requests[resultSelect.has_many_credits_requests.length - 1]
+    searchTerm.value = resultSelect.name
     filterResultsHistoryCreditRequest()
 }
 const filterResults = () => {
@@ -365,7 +371,25 @@ const viewSolicitudDeCredito = async (credito) => {
     ModelTablaCalculo.value.pagosMensuales = credito.pagos_mensuales
     ModelTablaCalculo.value.InteresMensual = credito.interes_mensual
     ModelTablaCalculo.value.periodos = credito.numeros_de_periodos
+    ModelTablaCalculo.value.cuota = CalculateCuota.value
+    formulario.value.uui = credito.uui
+    formulario.value.id = credito.id
     openModalViewAmortizaciones.value = true
+}
+const RecalcularCredito = async () => {
+    Fecha.value = moment()
+    var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), CalculateCuota.value, [], fechaParaAgregar.value);
+    while (amortizaciones.value.length > 0) {
+        amortizaciones.value.splice(0, 1);
+    }
+    for (let index = 0; index < result.length; index++) {
+        const element = result[index];
+        amortizaciones.value.push(element)
+    }
+    axios.post('/api/recalcular-amortizaciones', {  tablaCalculo: ModelTablaCalculo.value, 
+                                                    uui_credit_request:  formulario.value.uui, 
+                                                    credit_request_id: formulario.value.id, 
+                                                    amortizaciones: amortizaciones.value })
 }
 watch(() => ModelTablaCalculo, (newValue, oldValue) => {
     switch (newValue.value.tipoPago) {
@@ -618,26 +642,37 @@ onMounted(async () => {
             </h2>
         </template>
         <!-- banner cards -->
-        <!-- <div class="p-4 w-full">
+        <div class="p-4 w-full" v-if="UserSelected">
             <div class="grid grid-cols-12 gap-4">
-                <div class="col-span-12 sm:col-span-6 md:col-span-3">
+                <div class="col-span-4  ">
                     <div class="flex flex-row bg-white shadow-sm rounded p-4">
                         <div
                             class="flex items-center justify-center flex-shrink-0 h-12 w-12 rounded-xl bg-blue-100 text-blue-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                </path>
+                            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" >
+                            <g clip-path="url(#clip0_443_3628)">
+                            <rect x="2" y="6" width="20" height="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 10C21.4747 10 20.9546 9.89654 20.4693 9.69552C19.984 9.4945 19.543 9.19986 19.1716 8.82843C18.8001 8.45699 18.5055 8.01604 18.3045 7.53073C18.1035 7.04543 18 6.52529 18 6L22 6L22 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 18C18 16.9391 18.4214 15.9217 19.1716 15.1716C19.9217 14.4214 20.9391 14 22 14L22 18L18 18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 14C3.06087 14 4.07828 14.4214 4.82843 15.1716C5.57857 15.9217 6 16.9391 6 18L2 18L2 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 6C6 7.06087 5.57857 8.07828 4.82843 8.82843C4.07828 9.57857 3.06087 10 2 10L2 6H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14.0741 9.5H11.3333C10.597 9.5 10 10.0596 10 10.75C10 11.4404 10.597 12 11.3333 12H13.1111C13.8475 12 14.4444 12.5596 14.4444 13.25C14.4444 13.9404 13.8475 14.5 13.1111 14.5H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 9.51733V8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15.5173V14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_443_3628">
+                            <rect width="24" height="24" fill="white"/>
+                            </clipPath>
+                            </defs>
                             </svg>
                         </div>
                         <div class="flex flex-col flex-grow ml-4">
-                            <div class="text-sm text-gray-500">Users</div>
-                            <div class="font-bold text-lg">1259</div>
+                            <div class="text-sm text-gray-500">Total De Prestamos</div>
+                            <div class="font-bold text-lg">{{Totalresults}}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-span-12 sm:col-span-6 md:col-span-3">
+                <div class="col-span-4  ">
                     <div class="flex flex-row bg-white shadow-sm rounded p-4">
                         <div
                             class="flex items-center justify-center flex-shrink-0 h-12 w-12 rounded-xl bg-green-100 text-green-500">
@@ -648,29 +683,12 @@ onMounted(async () => {
                             </svg>
                         </div>
                         <div class="flex flex-col flex-grow ml-4">
-                            <div class="text-sm text-gray-500">Orders</div>
-                            <div class="font-bold text-lg">230</div>
+                            <div class="text-sm text-gray-500">Cliente Desde</div>
+                            <div class="font-bold text-lg">{{ClienteDesderesults.substr(0,10)}}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-span-12 sm:col-span-6 md:col-span-3">
-                    <div class="flex flex-row bg-white shadow-sm rounded p-4">
-                        <div
-                            class="flex items-center justify-center flex-shrink-0 h-12 w-12 rounded-xl bg-orange-100 text-orange-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="flex flex-col flex-grow ml-4">
-                            <div class="text-sm text-gray-500">New Clients</div>
-                            <div class="font-bold text-lg">190</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-12 sm:col-span-6 md:col-span-3">
+                <div class="col-span-4  ">
                     <div class="flex flex-row bg-white shadow-sm rounded p-4">
                         <div
                             class="flex items-center justify-center flex-shrink-0 h-12 w-12 rounded-xl bg-red-100 text-red-500">
@@ -682,13 +700,13 @@ onMounted(async () => {
                             </svg>
                         </div>
                         <div class="flex flex-col flex-grow ml-4">
-                            <div class="text-sm text-gray-500">Revenue</div>
-                            <div class="font-bold text-lg">$ 32k</div>
+                            <div class="text-sm text-gray-500">Ultimo Prestamo</div>
+                            <div class="font-bold text-lg">{{formatCurrency(UltimoPrestamoresults.monto_de_dinero_solicitado)}} / {{UltimoPrestamoresults.created_at.substr(0,10)}}</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>  -->
+        </div> 
         <!-- end banner cards -->
         <div class="grid grid-cols-12  justify-start">
             <div class=" max-w-[240px] flex flex-col col-span-3 ">
@@ -723,15 +741,6 @@ onMounted(async () => {
                                 class="hover:cursor-pointer hover:text-red-700">
                                 <path class="fill-current "
                                     d="M1,20a1,1,0,0,0,1,1h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5Zm12.707,9.707L20.414,17l2.293,2.293a1,1,0,1,1-1.414,1.414L19,18.414l-2.293,2.293a1,1,0,0,1-1.414-1.414L17.586,17l-2.293-2.293a1,1,0,0,1,1.414-1.414L19,15.586l2.293-2.293a1,1,0,0,1,1.414,1.414Z" />
-                            </svg>
-                        </span>
-                        <span class="flex absolute right-1 top-1/2 -mt-2 mr-6 items-center"
-                            @click.prevent="openEditModalUserDocument" v-if="UserSelected">
-                            <svg width="15px" height="15px" viewBox="0 0 1024 1024"
-                                class="hover:cursor-pointer hover:text-yellow-700">
-                                <path class="fill-current"
-                                    d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
-                                    fill="#000000" />
                             </svg>
                         </span>
                         <ul v-if="filteredResults.length > 0"
@@ -851,24 +860,7 @@ onMounted(async () => {
                         </p>
                     </div>
 
-                    <button v-if="UserSelected" @click.prevent="openSolicitarCredito"
-                        class="mx-auto flex gap-4 bg-indigo-800 hover:bg-indigo-700 focus:shadow-outline focus:outline-none text-white text-xs py-1 px-10 rounded my-4">
-                        Solicitar credito
-                        <svg width="15px" height="15px" viewBox="-3 0 32 32">
-                            <g id="icomoon-ignore">
-                            </g>
-                            <path
-                                d="M13.11 29.113c7.243 0 13.113-5.871 13.113-13.113s-5.87-13.113-13.113-13.113c-7.242 0-13.113 5.871-13.113 13.113s5.871 13.113 13.113 13.113zM13.11 3.936c6.652 0 12.064 5.412 12.064 12.064s-5.412 12.064-12.064 12.064c-6.653 0-12.064-5.412-12.064-12.064s5.411-12.064 12.064-12.064z"
-                                fill="#ffffff">
-
-                            </path>
-                            <path
-                                d="M13.906 21.637l0.742 0.742 6.378-6.379-6.378-6.379-0.742 0.742 5.112 5.112h-12.727v1.049h12.727z"
-                                fill="#ffffff">
-
-                            </path>
-                        </svg>
-                    </button>
+                    
 
                     <div class=" w-full my-2 flex justify-center " v-if="UserSelected">
                         <select v-model="ProductoSelected" disabled
@@ -932,7 +924,7 @@ onMounted(async () => {
             <div class="w-full mr-4  mt-2  flex flex-col gap-4  col-span-9  max-h-fit h-fit" v-if="UserSelected">
                 <div class="h-fit max-h-fit  bg-white border border-solid ">
                     <header class="px-5 py-4 border-b border-gray-100">
-                        <h2 class="font-semibold text-gray-800">Historial de creditos</h2>
+                        <h2 class="font-semibold text-gray-800">Creditos</h2>
                     </header>
                     <div class="p-3 h-fit max-h-fi">
                         <div class="overflow-x-auto">
@@ -1098,6 +1090,83 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
+            <div class="h-fit max-h-fit  bg-white border border-solid col-span-12 my-4  ">
+                    <header class="px-5 py-4 border-b border-gray-100">
+                        <h2 class="font-semibold text-gray-800">Historial</h2>
+                    </header>
+                <div class="p-3 h-fit max-h-fi">
+                    <div class="overflow-x-auto">
+                        <table class="table-auto w-full ">
+                            <thead class="text-[10px] font-semibold uppercase text-gray-400 bg-gray-50">
+                                <tr>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">Identificador</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Monto Solicitado</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Interes</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Fecha de inicio</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Fecha de termino</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Puntuacion credito</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Status</div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">Fecha solicitud</div>
+                                    </th>
+                                    
+
+                                </tr>
+                            </thead>
+                            <tbody class="text-[10px] divide-y divide-gray-100">
+                                <tr v-for="(credito, c) in filteredResultsHistoryCreditRequest" :key="c">
+                                    <td class="p-2 whitespace-nowrap text-[10px]">
+                                        <div class="text-left">{{ credito.uui }}</div>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <span class="">{{ formatCurrency(credito.monto_de_dinero_solicitado) }}</span>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <span class="">{{ credito.interes_mensual }}</span>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <span class="">{{ credito.has_many_amortizaciones[0].dias_pago  }}</span>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <span class="">{{ credito.has_many_amortizaciones[credito.has_many_amortizaciones.length -1].dias_pago  }}</span>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <!-- <span class="">{{ credito.has_many_credits_requests[credito.has_many_credits_requests - 1].dias_pago }}</span> -->
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-left font-medium text-green-500 text-[10px]">
+                                            <span
+                                                :class="{ 'bg-yellow-200 text-black py-1 px-3 rounded-full ': credito.status == 0, 'bg-orange-400 text-black py-1 px-3 rounded-full ': credito.status == 1, 'bg-red-400 text-white py-1 px-3 rounded-full ': credito.status == 2 }">
+                                                {{ credito.status == 0 ? 'Credito pendiente por revisar' :
+                                                    credito.status == 1 ? 'Credito aprobado para estudio' : credito.status
+                                                        == 2 ? 'Credito Rechazado' : '' }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <span class="">{{ credito.created_at.substr(0, 10) }}</span>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <modal :show="openModalViewAmortizaciones" maxWidth="">
@@ -1122,7 +1191,10 @@ onMounted(async () => {
                                     <tbody>
                                         <tr>
                                             <th class="px-4 w-2/4 py-2 text-left">Monto Prestamo</th>
-                                            <td class="border px-4 py-2"> {{ formatCurrency(valueRange) }}</td>
+                                            <td class="border px-4 py-2">
+                                                 <input min="0" v-model="valueRange" type="number"
+                                                        class="bg-transparent block border-2 peer px-3 w-full" />
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th class="px-4 w-2/4 py-2 text-left">Tipo de pago</th>
@@ -1196,6 +1268,10 @@ onMounted(async () => {
                                             <th class="px-4 w-2/4 py-2 text-left">Pago OLA</th>
                                             <td class="border px-4 py-2">{{ formatCurrency(CalculatePagoOla) }}</td>
                                         </tr>
+                                        <tr>
+                                            <th class="px-4 w-2/4 py-2 text-left">Cuota</th>
+                                            <td class="border px-4 py-2">{{ formatCurrency(CalculateCuota) }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                                 <div class="flex justify-end my-2 gap-2">
@@ -1218,6 +1294,7 @@ onMounted(async () => {
                                             type="button">
                                             Quiero mi credito
                                         </button> -->
+                                        <btnPrimary @click.prevent="RecalcularCredito()">Recalcular</btnPrimary>
                                 </div>
                             </div>
                         </div>
@@ -1348,6 +1425,7 @@ onMounted(async () => {
                             </tr>
                         </tbody>
                     </table>
+                   
                 </div>
             </template>
 
