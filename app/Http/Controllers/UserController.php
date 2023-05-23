@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\{User,CreditRequest};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -68,6 +68,19 @@ class UserController extends Controller
                 'hasOneDocument.hasManyFileDocument.hasOneStatusDocument', 
                 'hasManyComentarios', 
                 'hasManyComentarios.WhoDidComment')->where('id', $id)->first();
+            return response()->json($user);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function viewClienteParaPagar($id)
+    {
+        try {
+
+            $user = CreditRequest::with(
+                'hasManyAmortizaciones', 
+                'hasManyAmortizaciones.hasOneScore', 
+                'belongToUser')->where('ine_o_identificacion_oficial', $id)->first();
             return response()->json($user);
         } catch (\Throwable $th) {
             throw $th;
@@ -143,4 +156,4 @@ class UserController extends Controller
     {
         //
     }
-}
+}  

@@ -3,9 +3,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted, watch, computed } from 'vue';
 import btnPrimary from '../../Components/PrimaryButton.vue'
 import listExpacionPanel from "../../Components/listWithExpancionPanel.vue";
+import textInput from "../../Components/TextInput.vue";
 import modal from "../../Components/DialogModal.vue";
 import moment from "moment";
 import { useCreditRequest } from '../../stores/creditRequest'
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     isCliente: Boolean,
@@ -40,6 +42,8 @@ const ProductoSelected = ref('Selecciona el producto');
 const openModalEditUser = ref(false);
 const openModalSolicitarCredito = ref(false);
 const openModalScore = ref(false);
+const openModalRealizarPago = ref(false);
+const ineClienteParaPagar = ref('');
 const headerTableBancoDeDatos = ref([
     { header: "Nombre de supervisor OLA ", fixed: false, value: '', class: '', show: false },
     { header: "Ciudad ", fixed: false, value: '', class: '', show: false },
@@ -86,6 +90,7 @@ const modelComentario = ref({
     user_id: null
 })
 const scoreDelUsuario = ref(0);
+const UserParaPagar = ref(0);
 
 const modelDocument = ref({
     ine_identificacion: null,
@@ -343,6 +348,50 @@ const openSimuladorDeCredito = async () => {
 const openModalScoreModal = async () => {
     openModalScore.value = true
 }
+const enviarCreditRequest = async () => {
+    try {
+        Fecha.value = moment();
+        var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
+        amortizaciones.value.splice(0, amortizaciones.value.length);
+        for (let index = 0; index < result.length; index++) {
+            const element = result[index];
+            storeCreditRequest.setAmortizaciones(element)
+        }
+        let { data } = await axios.post(route('store.credit.request'), {
+            amortizaciones: amortizaciones.value,
+            BancoDeDatos: BancoDeDatos.value,
+            UserSelected: UserSelected.value,
+            ProductoSelected: ProductoSelected.value,
+            monto_solicitado: valueRange.value,
+            tipo_de_pago:  ModelTablaCalculo.value.tipoPago,
+            pagos_mensuales: ModelTablaCalculo.value.pagosMensuales,
+            numero_de_periodos: ModelTablaCalculo.value.periodos,
+            meses: CalculateMeses.value,
+            interes_mensual: ModelTablaCalculo.value.InteresMensual,
+            pago_total: CalculatePagoTotal.value,
+            pago_ola: CalculatePagoOla.value,
+        });
+        openModalSolicitarCredito.value = false
+        getUsuarios()
+    } catch (error) {
+        console.log(error)
+    }
+}
+const realizarPago = async () => {
+    openModalRealizarPago.value = true
+}
+const findCliente = async () => {
+    try{
+        let {data}  = await axios(route('view.cliente.para.pagar',{id: ineClienteParaPagar.value }))
+        UserParaPagar.value = data
+    }catch(e){
+
+    }
+}
+
+const pagarCuota =  async () => {
+    router.visit(route('crear.creditos.obligaciones',{credito_id: UserParaPagar.value.uui}) )
+}
 
 watch(() => ModelTablaCalculo, (newValue, oldValue) => {
     switch (newValue.value.tipoPago) {
@@ -535,35 +584,7 @@ watch(() => ProductoSelected.value, (newValue, oldValue) => {
     }
 
 }, { deep: true })
-const enviarCreditRequest = async () => {
-    try {
-        Fecha.value = moment();
-        var result = await calcularTabla(parseInt(valueRange.value), parseFloat(parseFloat(((ModelTablaCalculo.value.InteresMensual / ModelTablaCalculo.value.pagosMensuales) * valueRange.value) / 100).toFixed(2)), ModelTablaCalculo.value.cuota, [], fechaParaAgregar.value);
-        amortizaciones.value.splice(0, amortizaciones.value.length);
-        for (let index = 0; index < result.length; index++) {
-            const element = result[index];
-            storeCreditRequest.setAmortizaciones(element)
-        }
-        let { data } = await axios.post(route('store.credit.request'), {
-            amortizaciones: amortizaciones.value,
-            BancoDeDatos: BancoDeDatos.value,
-            UserSelected: UserSelected.value,
-            ProductoSelected: ProductoSelected.value,
-            monto_solicitado: valueRange.value,
-            tipo_de_pago:  ModelTablaCalculo.value.tipoPago,
-            pagos_mensuales: ModelTablaCalculo.value.pagosMensuales,
-            numero_de_periodos: ModelTablaCalculo.value.periodos,
-            meses: CalculateMeses.value,
-            interes_mensual: ModelTablaCalculo.value.InteresMensual,
-            pago_total: CalculatePagoTotal.value,
-            pago_ola: CalculatePagoOla.value,
-        });
-        openModalSolicitarCredito.value = false
-        getUsuarios()
-    } catch (error) {
-        console.log(error)
-    }
-}
+
 onMounted(async () => {
     getUsuarios()
 
@@ -573,8 +594,11 @@ onMounted(async () => {
 <template>
     <AppLayout title="Crear Creditos" :isCliente="isCliente">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight flex justify-between ">
                 Crear Creditos
+                <btnPrimary  @click.prevent="realizarPago" >
+                    Realizar Pago
+                </btnPrimary>
             </h2>
         </template>
         <div class="grid grid-cols-12  justify-start">
@@ -1621,68 +1645,7 @@ onMounted(async () => {
                 <!-- <section class="antialiased bg-gray-100 text-gray-600 h-screen px-4" x-data="app"> -->
                 <div class="w-full  mx-auto bg-white shadow-lg rounded-sm mt-4">
                     
-                        <!-- <pre>{{UserSelected}}</pre> -->
-                        <!-- <table class="table-auto w-full " v-for="(creditos , c) in UserSelected.has_many_credits_requests" :ke="c">
-                            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
-                                <tr>
-                                    <th class="p-2">
-                                        <div class="font-semibold text-left">
-                                            Periodo
-                                        </div>
-                                    </th>
-                                    <th class="p-2">
-                                        <div class="font-semibold text-left">
-                                            Capital
-                                        </div>
-                                    </th>
-                                    <th class="p-2">
-                                        <div class="font-semibold text-left">
-                                            Interés
-                                        </div>
-                                    </th>
-                                    <th class="p-2">
-                                        <div class="font-semibold text-left">
-                                            Pago
-                                        </div>
-                                    </th>
-                                    <th class="p-2">
-                                        <div class="font-semibold text-left">
-                                            Días de pago
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody class="text-sm divide-y divide-gray-100">
-                                <tr v-for="(pago, p) in amortizaciones" :key='p'>
-                                    <td class="p-2">
-                                        <div class="font-medium text-gray-800">
-                                            {{ pago.periodo }}
-                                        </div>
-                                    </td>
-                                    <td class="p-2">
-                                        <div class="text-left">
-                                            {{ formatCurrency(pago.capital) }}
-                                        </div>
-                                    </td>
-                                    <td class="p-2">
-                                        <div class="text-left font-medium text-green-500">
-                                            {{ formatCurrency(pago.interes) }}
-                                        </div>
-                                    </td>
-                                    <td class="p-2">
-                                        <div class="text-left font-medium text-green-500">
-                                            {{ formatCurrency(pago.pago) }}
-                                        </div>
-                                    </td>
-                                    <td class="p-2">
-                                        <div class="text-right font-medium text-green-500">
-                                            {{ pago.dias_pago }}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table> -->
+                       
                         <div class="w-full mr-4  bg-white mt-2 border border-gray-200"  v-for="(creditos , c) in UserSelected.has_many_credits_requests" :key="c">
                             <header class="px-5 py-4 border-b border-gray-100">
                                 <h2 class="font-semibold text-gray-800">Credito {{creditos.uui}} </h2>
@@ -1776,6 +1739,126 @@ onMounted(async () => {
                     
                 </div>
                 <!-- </section> -->
+            </template>
+        </modal>
+        <modal :show="openModalRealizarPago"  maxWidth=" ">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3" @click="openModalRealizarPago = !openModalRealizarPago">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+
+            <template #content>
+                
+                <div class="w-full  mx-auto bg-white mt-6 rounded-sm">
+                
+                    <div>
+                        <input @keyup.enter="findCliente" v-model="ineClienteParaPagar" type="text" class="border border-gray-300 py-2 px-4 rounded-lg w-full" placeholder="Ingresa Identificación">
+                    </div>
+
+                        <div class="w-full mr-4  bg-white mt-2 border border-gray-200"  >
+                            <header class="px-5 py-4 border-b border-gray-100">
+                                <h2 class="font-semibold text-gray-800">Credito {{UserParaPagar.uui}} </h2>
+                            </header>
+                            <div class="p-3">
+                                <div class="overflow-x-auto">
+                                    <table class="table-auto w-full ">
+                                        <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                                            <tr>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-left">
+                                                        Periodo
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-left">
+                                                        Capital
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-left">
+                                                        Interés
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-left">
+                                                        Pago
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-right">
+                                                        Días de pago
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-right">
+                                                        Score
+                                                    </div>
+                                                </th>
+                                                <th class="p-2">
+                                                    <div class="font-semibold text-right">
+                                                        Comentario
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody class="text-sm divide-y divide-gray-100">
+                                            <tr v-for="(pago, p) in UserParaPagar.has_many_amortizaciones" :key='p'>
+                                                <td class="p-2">
+                                                    <div class="font-medium text-gray-800">
+                                                        {{ pago.periodo }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-left">
+                                                        {{ formatCurrency(pago.capital) }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-left font-medium text-green-500">
+                                                        {{ formatCurrency(pago.interes) }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-left font-medium text-green-500">
+                                                        {{ formatCurrency(pago.pago) }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-right font-medium ">
+                                                        {{ pago.dias_pago }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-right font-medium ">
+                                                        {{ pago.has_one_score ? pago.has_one_score.score : ''  }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-2">
+                                                    <div class="text-right font-medium ">
+                                                        {{ pago.has_one_score ? pago.has_one_score.comentario : ''  }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>   
+                
+                </div>
+                
+            </template>
+            <template #footer >
+                <btnPrimary @click.prevent="pagarCuota"  >
+                    Pagar
+                </btnPrimary>   
             </template>
         </modal>
         </AppLayout>

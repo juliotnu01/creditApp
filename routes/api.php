@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/get-users-clientes',[UserController::class, 'indexClientes'])->name('get.users.cliente');
     Route::post('/create-new-cliente',[UserController::class, 'create'])->name('create.new.cliente');
     Route::get('/view-cliente/{id}',[UserController::class, 'viewCliente'])->name('view.cliente');
+    
     Route::post('/edit-cliente/{id}',[UserController::class, 'update'])->name('edit.cliente');
     Route::get('/get-credit-request',[CreditRequestController::class, 'index'])->name('get.credit.request');
     Route::post('/enviar-credito-a-estudio',[CreditRequestController::class, 'enviarCreditoAEstudio'])->name('enviar.credito.a.estuidio');
@@ -47,6 +48,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/add-document-file',[BancoDeDatosController::class, 'addDocumentFile'])->name('add.document.file');
     Route::post('/guardar-solicitud-de-credito', [CreditRequestController::class, 'store'])->name('store.credit.request');
     Route::put('/update-document-status', [BancoDeDatosController::class, 'updateDocumentStatus'])->name('update.document.status');
+    Route::get('/cliente-para-pagar/{id}',[UserController::class, 'viewClienteParaPagar'])->name('view.cliente.para.pagar');
 // });
 
 
