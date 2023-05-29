@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Aamortizacion,CreditRequest};
+use App\Models\{Aamortizacion,CreditRequest, ScoreAmortizacion};
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Storage;
@@ -129,6 +129,57 @@ class AaMortizacioncontroller extends Controller
                 $amort->save();
             }
 
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function addPagoComprobanteUser(Request $request)
+    {
+        try {
+            return DB::transaction(function () use ($request){
+                $data = json_decode($request->data);
+                $file = $request->file('fileComprobante');
+                
+                if($file){
+                    Storage::disk('public')->putFileAs("/comprobantes/fecha_comprobante_$data->fechaComprobante/creadito_$data->uui_credit_request/periodo_$data->periodo/". substr(Carbon::now(), 0, 10) ."/" , $file, $file->getClientOriginalName());
+                    $urlComprobante = asset(Storage::disk('public')->url("/comprobantes/fecha_comprobante_$data->fechaComprobante/creadito_$data->uui_credit_request/periodo_$data->periodo/". substr(Carbon::now(), 0, 10) ."/".$file->getClientOriginalName()));
+                }else {
+                    $urlComprobante = '';
+                }
+                
+                if($data->restante <= 0){
+                    $fecha1 = Carbon::parse($data->dias_pago);
+                    $fechaActual = Carbon::parse($data->fechaComprobante);
+                    $diferenciaDias = $fechaActual->diffInDays($fecha1, false);
+                    $amortizacion = new Aamortizacion();
+                    $amortizacion->find($data->id)->update([
+                        'ruta_recibo_de_pago' => $urlComprobante,
+                        "fecha_comprobante" => $data->fechaComprobante,
+                        "status" => 1,
+                        "dias_pago_total" => $diferenciaDias,
+                    ]);
+                    if($data->has_one_score){
+                        ScoreAmortizacion::find($data->has_one_score->id)->update([ "score" => ($data->has_one_score->score + $diferenciaDias), 'comentario' => "pago de la cuota el dia ". substr(Carbon::now(), 0, 10)  ]);
+                    }else{
+                        ScoreAmortizacion::create(["score" => $diferenciaDias, "amortizacions_id" => $data->id,'comentario' => "pago de la cuota el dia ". substr(Carbon::now(), 0, 10)  ]);
+                    }
+                }else{
+                    $amortizacion = new Aamortizacion();
+                    $amortizacion->find($data->id)->update([
+                        'ruta_recibo_de_pago' => $urlComprobante,
+                        "fecha_comprobante" => $data->fechaComprobante,
+                        "status" => 0,
+                        "pago" => $data->pago - $data->pagoCuota,
+                        "restante" => $data->restante,
+                    ]);
+                    if($data->has_one_score){
+                        ScoreAmortizacion::find($data->has_one_score->id)->update([ 'comentario' => "".$data->has_one_score->comentario.", abono de $data->pagoCuota el dia ". substr(Carbon::now(), 0, 10)  ]);
+                    }else{
+                        ScoreAmortizacion::create([ "amortizacions_id" => $data->id,'comentario' => "abono de $data->pagoCuota el dia ". substr(Carbon::now(), 0, 10)  ]);
+                    }
+                }
+            });
         } catch (\Throwable $th) {
             throw $th;
         }
