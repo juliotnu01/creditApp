@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::put('/update-document-status', [BancoDeDatosController::class, 'updateDocumentStatus'])->name('update.document.status');
     Route::get('/cliente-para-pagar/{id}',[UserController::class, 'viewClienteParaPagar'])->name('view.cliente.para.pagar');
     Route::post('/add-pago-comprobante-user',[AaMortizacioncontroller::class, 'addPagoComprobanteUser'])->name('add.pago.comprobante.user');
+    Route::post('/add-pago-user-a-compromiso',[AaMortizacioncontroller::class, 'addPagoACompromiso'])->name('add.user.compromiso');
 
 // });
 

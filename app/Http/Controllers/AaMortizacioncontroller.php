@@ -147,7 +147,7 @@ class AaMortizacioncontroller extends Controller
                 }else {
                     $urlComprobante = '';
                 }
-                
+
                 if($data->restante <= 0){
                     $fecha1 = Carbon::parse($data->dias_pago);
                     $fechaActual = Carbon::parse($data->fechaComprobante);
@@ -179,6 +179,23 @@ class AaMortizacioncontroller extends Controller
                         ScoreAmortizacion::create([ "amortizacions_id" => $data->id,'comentario' => "abono de $data->pagoCuota el dia ". substr(Carbon::now(), 0, 10)  ]);
                     }
                 }
+            });
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function addPagoACompromiso(Request $request)
+    {
+        try {
+            
+            return DB::transaction(function () use ($request){
+                $data = $request->only(['fecha_compromiso', 'compromiso', 'id']);
+                $amortizacion = new Aamortizacion();
+                $amortizacion->find($data['id'])->update([
+                    "fecha_compromiso" => $data['fecha_compromiso'],
+                    "compromiso" => 1
+                ]);
             });
         } catch (\Throwable $th) {
             throw $th;
