@@ -23,7 +23,7 @@ class BancoDeDatosController extends Controller
                 // dd($request->all());
                 for ($i = 0; $i <   count($request->all()); $i++) {
                     $banco = new BancoDeDatos();
-                    $banco->nombre_supervisor_ola = $request[$i]['Nombre de supervisor OLA '];
+                    // $banco->nombre_supervisor_ola = $request[$i]['Nombre de supervisor OLA '];
                     $banco->ciudad = $request[$i]['Ciudad '];
                     $banco->nombre_completo = $request[$i]['NOMBRE COMPLETO'];
                     $banco->fecha_de_nacimiento = $request[$i]['Fecha de nacimiento'];
