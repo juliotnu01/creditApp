@@ -19,7 +19,14 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones','hasManyAmortizaciones.hasOneScore', 'hasEstadoCredito')->get();
+            $creditRequest = CreditRequest::with([
+                                                    'belongToUser', 
+                                                    'hasManyAmortizaciones',
+                                                    'hasManyAmortizaciones.hasOneScore', 
+                                                    'hasManyAmortizaciones.hasManyCompromisos',
+                                                    'hasEstadoCredito'
+
+                                                    ])->get();
             return response()->json($creditRequest);
         } catch (\Throwable $th) {
             throw $th;
@@ -30,9 +37,13 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones','hasManyAmortizaciones.hasOneScore', 'hasEstadoCredito')
-                ->where('user_id', $id)
-                ->get();
+            $creditRequest = CreditRequest::with([
+                                                    'belongToUser', 
+                                                    'hasManyAmortizaciones',
+                                                    'hasManyAmortizaciones.hasOneScore', 
+                                                    'hasManyAmortizaciones.hasManyCompromisos',
+                                                    'hasEstadoCredito'
+                                                ])->where('user_id', $id)->get();
             return response()->json($creditRequest);
         } catch (\Throwable $th) {
             throw $th;
@@ -42,7 +53,12 @@ class CreditRequestController extends Controller
     {
         try {
 
-            $creditRequest = CreditRequest::with('belongToUser', 'hasManyAmortizaciones','hasManyAmortizaciones.hasOneScore', 'hasEstadoCredito')->where('user_id', $id)->orderBy('id', 'DESC')->first();
+            $creditRequest = CreditRequest::with([  
+                                                    'belongToUser', 
+                                                    'hasManyAmortizaciones',
+                                                    'hasManyAmortizaciones.hasManyCompromisos',
+                                                    'hasManyAmortizaciones.hasOneScore', 
+                                                    'hasEstadoCredito'])->where('user_id', $id)->orderBy('id', 'DESC')->first();
             return response()->json($creditRequest);
         } catch (\Throwable $th) {
             throw $th;

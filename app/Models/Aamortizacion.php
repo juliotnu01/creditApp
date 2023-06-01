@@ -17,4 +17,8 @@ class Aamortizacion extends Model
     {
         return $this->hasOne(ScoreAmortizacion::class, 'amortizacions_id');
     }
+    public function hasManyCompromisos()
+    {
+        return $this->hasMany(Compromiso::class, 'amortizacion_id');
+    }
 }

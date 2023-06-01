@@ -23,6 +23,7 @@ class UserController extends Controller
             $users = User::with(
                 'hasManyCreditsRequests', 
                 'hasManyCreditsRequests.hasManyAmortizaciones', 
+                'hasManyCreditsRequests.hasManyAmortizaciones.hasManyCompromisos', 
                 'hasManyCreditsRequests.hasManyAmortizaciones.hasOneScore', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
@@ -42,6 +43,7 @@ class UserController extends Controller
             $users = User::with(
                 'hasManyCreditsRequests', 
                 'hasManyCreditsRequests.hasManyAmortizaciones', 
+                'hasManyCreditsRequests.hasManyAmortizaciones.hasManyCompromisos', 
                 'hasManyCreditsRequests.hasManyAmortizaciones.hasOneScore', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 
@@ -60,7 +62,8 @@ class UserController extends Controller
 
             $user = User::with(
                 'hasManyCreditsRequests', 
-                'hasManyCreditsRequests.hasManyAmortizaciones', 
+                'hasManyCreditsRequests.hasManyAmortizaciones',
+                'hasManyCreditsRequests.hasManyAmortizaciones.hasManyCompromisos',  
                 'hasManyCreditsRequests.hasManyAmortizaciones.hasOneScore', 
                 'hasManyCreditsRequests.belongToUser', 
                 'hasOneDocument', 

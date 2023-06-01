@@ -11,7 +11,9 @@ const props = defineProps({
 const AmortizaiconesGenerales = ref([]);
 const openModal = ref(false);
 const openModalCompromisos = ref(false);
+const openModalViewCompromisos = ref(false);
 const modelPago = reactive({ datosDePagos: null, pagos: [], });
+const modelPagoCompromiso = reactive({ datosDePagos: null, pagos: null, });
 const pagoCuota = ref(0)
 const solicitudesDecreditos = ref(null);
 const formatCurrency = (value) => {
@@ -34,6 +36,31 @@ const getCreditosAmortizaicones = async () => {
                 iterator.comentarioNewPago = '';
                 iterator.fileComprobante = null;
                 iterator.fechaComprobante = moment().format('YYYY-MM-DD');
+                iterator.pagoCompromiso = false;
+
+                if(iterator.status == 2){
+                    if(iterator.has_many_compromisos.length > 0){
+                        iterator.pagoCompromiso = true;
+                    }
+                }
+
+
+                if(iterator.has_many_compromisos){
+                    for (const iterator2 of iterator.has_many_compromisos) {
+                        iterator2.caducado = false;
+                    }
+
+                    for (let index = 0; index < iterator.has_many_compromisos.length; index++) {
+                        const element = iterator.has_many_compromisos[index];
+                        var fechaEspecifica = moment(element.fecha_compromiso);
+                        var fechaActual = moment();
+                        var diferenciaEnDias = fechaEspecifica.diff(fechaActual, 'days');
+                        if(diferenciaEnDias < 0){
+                            element.caducado = true
+                        }
+                    }
+                }
+
             }
             return credito.has_many_amortizaciones
         }).reduce((acumulador, elemento) => {
@@ -73,6 +100,12 @@ const openModalCompromiso = (obligacion = null) => {
     modelPago.pagos.push(obligacion)
     openModalCompromisos.value = true
 }
+const openModalViewCompromiso = (obligacion = null) => {
+    obligacion.pagoCuota = 0
+    modelPagoCompromiso.datosDePagos = obligacion
+    modelPagoCompromiso.pagos = obligacion
+    openModalViewCompromisos.value = true
+}
 const handleFileComprobante = (e, pago) => {
     pago.fileComprobante = e.target.files[0]
 }
@@ -108,6 +141,8 @@ const RalizarCompromiso = async () => {
         console.log(error)
     }
 }
+
+
 
 watch(() => modelPago.pagos, (newValue, oldValue) => {
     newValue[newValue.length - 1].restante = parseFloat(parseFloat(newValue[newValue.length - 1].pago - newValue[newValue.length - 1].pagoCuota).toFixed(2))
@@ -179,12 +214,12 @@ onMounted(() => {
                                 </th>
                                 <th class="p-2">
                                     <div class="font-semibold text-center">
-                                        Fecha de compromiso
+                                        Compromiso
                                     </div>
                                 </th>
                                 <th class="p-2">
                                     <div class="font-semibold text-center">
-                                        Compromiso
+                                        Fecha compromiso de pago
                                     </div>
                                 </th>
                                 <th class="p-2">
@@ -253,16 +288,31 @@ onMounted(() => {
                                     </div>
                                 </td>
                                 <td class="p-2">
-                                    <div class="text-center font-medium whitespace-no-wrap" v-show="pago.fecha_compromiso">
-                                        <span class="bg-red-700 text-white py-1 px-3 rounded-full">
-                                            {{ pago.fecha_compromiso }}
+                                    <div class="text-center font-medium whitespace-no-wrap" v-if="pago.has_many_compromisos.length > 0">
+                                        <span :class="{ 'bg-green-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == false, 
+                                                        'bg-red-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == true }">
+                                            {{ pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == false ? pago.has_many_compromisos[pago.has_many_compromisos.length -1].fecha_compromiso : pago.has_many_compromisos[pago.has_many_compromisos.length -1].fecha_compromiso }}
                                         </span>
                                     </div>
                                 </td>
                                 <td class="p-2">
-                                    <div class="text-center font-medium whitespace-no-wrap" v-show="pago.compromiso">
-                                        <span class="bg-red-700 text-white py-1 px-3 rounded-full">
-                                            {{ pago.compromiso ? 'Activo' : '' }}
+                                    <div class="text-center font-medium whitespace-no-wrap" v-if="pago.has_many_compromisos.length > 0">
+                                        <span :class="{ 'bg-green-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == false, 
+                                                        'bg-red-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == true }">
+                                            {{ pago.has_many_compromisos[pago.has_many_compromisos.length -1].caducado  == false ? 'Activo' : 'Caducado' }}
+                                            <svg @click.prevent="openModalViewCompromiso(pago)" width="24px" height="24px" viewBox="0 0 24 24" fill="none" class="text-white hover:cursor-pointer">
+                                                <g id="style=stroke">
+                                                    <g id="eye-open">
+                                                        <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd"
+                                                            d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 13.245 10.755 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 10.755 13.245 9.75 12 9.75ZM8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C14.0734 8.25 15.75 9.92657 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C9.92657 15.75 8.25 14.0734 8.25 12Z"
+                                                            fill="currentColor" />
+                                                        <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd"
+                                                            d="M2.28282 9.27342C4.69299 5.94267 8.19618 3.96997 12.0001 3.96997C15.8042 3.96997 19.3075 5.94286 21.7177 9.27392C22.2793 10.0479 22.5351 11.0421 22.5351 11.995C22.5351 12.948 22.2792 13.9424 21.7174 14.7165C19.3072 18.0473 15.804 20.02 12.0001 20.02C8.19599 20.02 4.69264 18.0471 2.28246 14.716C1.7209 13.942 1.46509 12.9478 1.46509 11.995C1.46509 11.0419 1.721 10.0475 2.28282 9.27342ZM12.0001 5.46997C8.74418 5.46997 5.66753 7.15436 3.49771 10.1532L3.497 10.1542C3.15906 10.6197 2.96509 11.2866 2.96509 11.995C2.96509 12.7033 3.15906 13.3703 3.497 13.8357L3.49771 13.8367C5.66753 16.8356 8.74418 18.52 12.0001 18.52C15.256 18.52 18.3326 16.8356 20.5025 13.8367L20.5032 13.8357C20.8411 13.3703 21.0351 12.7033 21.0351 11.995C21.0351 11.2866 20.8411 10.6197 20.5032 10.1542L20.5025 10.1532C18.3326 7.15436 15.256 5.46997 12.0001 5.46997Z"
+                                                            fill="currentColor" />
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                            {{pago.has_many_compromisos.length}}
                                         </span>
                                     </div>
                                 </td>
@@ -312,6 +362,12 @@ onMounted(() => {
                                 <td class="p-2">
                                     <div class="text-right font-medium ">
                                         {{ pago.has_one_score ? pago.has_one_score.comentario : '' }}
+                                        <div v-if="pago.has_many_compromisos.length > 0">
+
+                                            <p v-for="(comentario, c) in pago.has_many_compromisos" :key="c">
+                                                {{ comentario.comentario }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="p-2 text-center flex justify-center gap-3">
@@ -638,11 +694,95 @@ onMounted(() => {
                     </table>
                 </div>
             </div>
-        </template>
-        <template #footer>
-            <btnPrimay @click.prevent="RalizarCompromiso">
-                Realizar compromiso
-            </btnPrimay>
-        </template>
-    </modal>
-</AppLayout></template>
+            </template>
+            <template #footer>
+                <btnPrimay @click.prevent="RalizarCompromiso">
+                    Realizar compromiso
+                </btnPrimay>
+            </template>
+        </modal>
+        <modal :show="openModalViewCompromisos" maxWidth="2xl">
+            <template #title>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    @click="openModalViewCompromisos = !openModalViewCompromisos">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </span>
+            </template>
+
+            <template #content>
+                <div class="w-full  mx-auto bg-white shadow-lg rounded-sm border border-gray-200 my-2">
+                    <div class="overflow-x-auto p-2">
+                        <div class="flex gap-2 justify-between w-full mb-4">
+                            <div class="flex flex-col">
+                                <span class=" text-lg  ">capital: {{ formatCurrency(modelPagoCompromiso.datosDePagos.capital) }} </span>
+                                <span class=" text-lg  ">Interes: {{ formatCurrency(modelPagoCompromiso.datosDePagos.interes) }} </span>
+                                <span class=" text-lg  ">Cuota: {{ formatCurrency(modelPagoCompromiso.datosDePagos.pago) }} </span>
+                                <span class=" text-lg  ">Periodo: {{ modelPagoCompromiso.datosDePagos.periodo }} </span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="tex-[10px]">Credito: {{ modelPagoCompromiso.datosDePagos.uui_credit_request }} </span>
+                                <span class=" text-lg  ">Dia de pago: {{ modelPagoCompromiso.datosDePagos.dias_pago }} </span>
+                                <span :class="{
+                                    'bg-green-200 text-black py-1 px-3 rounded-full ': calculateMora(modelPagoCompromiso.datosDePagos.dias_pago) >= 0,
+                                    'bg-red-200 text-black py-1 px-3 rounded-full ': calculateMora(modelPagoCompromiso.datosDePagos.dias_pago) < 0
+                                }">
+                                    Dia de mora: {{ calculateMora(modelPagoCompromiso.datosDePagos.dias_pago) }}
+                                </span>
+                            </div>
+                        </div>
+                        <table class="table-auto w-full ">
+                            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                                <tr>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Fecha compromiso de pago
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-center">
+                                            Status
+                                        </div>
+                                    </th>
+                                    <th class="p-2">
+                                        <div class="font-semibold text-left">
+                                            Comentario
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-gray-100">
+                                <tr v-for="(pago, p) in modelPagoCompromiso.pagos.has_many_compromisos" :key="p">
+                                <td class="p-2">
+                                    <input disabled v-model="pago.fecha_compromiso" class=" h-2 mb-2  px-4 py-2 border rounded"
+                                        type="date" />
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-center font-medium whitespace-no-wrap" >
+                                        <span :class="{'bg-green-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.caducado == false, 'bg-red-700 text-white py-1 px-3 rounded-full flex justify-between gap-2': pago.caducado == true }">
+                                            {{ pago.caducado == false ? 'Activo' : 'Caducado' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="p-2">
+                                    <div class="text-right font-medium " >
+                                        <input disabled type="text" v-model="pago.comentario"
+                                            class="relative m-0 w-full text-right block  min-w-4 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </template>
+            <template #footer>
+                
+            </template>
+        </modal>
+    </AppLayout>
+</template>

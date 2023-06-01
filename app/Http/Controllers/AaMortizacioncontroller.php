@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Aamortizacion,CreditRequest, ScoreAmortizacion};
+use App\Models\{Aamortizacion,CreditRequest, ScoreAmortizacion, Compromiso};
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Storage;
@@ -190,12 +190,16 @@ class AaMortizacioncontroller extends Controller
         try {
             
             return DB::transaction(function () use ($request){
-                $data = $request->only(['fecha_compromiso', 'compromiso', 'id']);
-                $amortizacion = new Aamortizacion();
-                $amortizacion->find($data['id'])->update([
+                $data = $request->only(['fecha_compromiso', 'compromiso', 'id',"comentarioNewPago"]);
+                $compromiso = new Compromiso();
+                $compromiso->create([
                     "fecha_compromiso" => $data['fecha_compromiso'],
-                    "compromiso" => 1
+                    "compromiso" => 1,
+                    "amortizacion_id" => $data['id'],
+                    'comentario' => $data['comentarioNewPago']
                 ]);
+
+                
             });
         } catch (\Throwable $th) {
             throw $th;
